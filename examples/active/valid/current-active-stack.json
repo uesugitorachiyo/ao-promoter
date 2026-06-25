@@ -1,0 +1,28 @@
+{
+  "schema_version": "ao.promoter.active-stack.v0.1",
+  "stack_id": "ao-stack-local",
+  "created_at_utc": "2026-06-25T00:00:00Z",
+  "previous_stack_ref": "none",
+  "promotion_history": [],
+  "trust_boundary": "public-preview-local",
+  "slots": {
+    "factory": {
+      "slot": "factory",
+      "component_id": "ao-forge",
+      "version": "v0.1.0",
+      "source_ref": "github.com/uesugitorachiyo/ao-forge@v0.1.0",
+      "activated_by": "fixture",
+      "activation_gate": "fixture",
+      "rollback_ref": "rollback://ao-forge"
+    },
+    "policy": {
+      "slot": "policy",
+      "component_id": "ao-covenant",
+      "version": "v0.1.0",
+      "source_ref": "github.com/uesugitorachiyo/ao-covenant@v0.1.0",
+      "activated_by": "fixture",
+      "activation_gate": "fixture",
+      "rollback_ref": "rollback://ao-covenant"
+    }
+  }
+}

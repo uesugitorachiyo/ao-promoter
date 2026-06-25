@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ao.local/contracts/promoter-activation-plan-v0.1.schema.json",
+  "title": "AO Promoter Activation Plan v0.1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "plan_id",
+    "candidate_id",
+    "target_stack_id",
+    "target_slot",
+    "current_component",
+    "next_component",
+    "required_gate_ref",
+    "rollback_plan_ref",
+    "actions",
+    "dry_run_only",
+    "mutates_live_state"
+  ],
+  "properties": {
+    "schema_version": { "const": "ao.promoter.activation-plan.v0.1" },
+    "plan_id": { "type": "string" },
+    "candidate_id": { "type": "string" },
+    "target_stack_id": { "type": "string" },
+    "target_slot": { "type": "string" },
+    "current_component": { "type": "object" },
+    "next_component": { "type": "object" },
+    "required_gate_ref": { "type": "string" },
+    "rollback_plan_ref": { "type": "string" },
+    "actions": { "type": "array" },
+    "dry_run_only": { "const": true },
+    "mutates_live_state": { "const": false }
+  },
+  "additionalProperties": true
+}

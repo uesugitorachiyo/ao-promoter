@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ao.local/contracts/promoter-packet-v0.1.schema.json",
+  "title": "AO Promoter Promotion Packet v0.1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "packet_id",
+    "candidate",
+    "current_active_stack",
+    "required_gate_roles",
+    "evidence",
+    "freshness_policy",
+    "promotion_policy",
+    "rollback_required",
+    "dry_run_only"
+  ],
+  "properties": {
+    "schema_version": { "const": "ao.promoter.packet.v0.1" },
+    "packet_id": { "type": "string", "minLength": 1 },
+    "candidate": { "$ref": "promoter-candidate-v0.1.schema.json" },
+    "current_active_stack": { "type": "string", "minLength": 1 },
+    "required_gate_roles": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 8
+    },
+    "evidence": {
+      "type": "array",
+      "items": { "$ref": "promoter-evidence-ref-v0.1.schema.json" },
+      "minItems": 8
+    },
+    "freshness_policy": { "type": "object" },
+    "promotion_policy": { "type": "object" },
+    "rollback_required": { "type": "boolean" },
+    "dry_run_only": { "const": true }
+  },
+  "additionalProperties": true
+}

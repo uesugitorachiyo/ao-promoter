@@ -1,0 +1,135 @@
+{
+  "schema_version": "ao.promoter.packet.v0.1",
+  "packet_id": "ao-promoter-v0.1",
+  "candidate": {
+    "schema_version": "ao.promoter.candidate.v0.1",
+    "candidate_id": "ao-foundry",
+    "display_name": "AO Foundry",
+    "component_kind": "factory",
+    "version": "v0.1.0",
+    "source_ref": "github.com/uesugitorachiyo/ao-foundry@v0.1.0",
+    "target_slot": "factory",
+    "target_stack_id": "ao-stack-local",
+    "trust_boundary": "public-preview-local",
+    "expected_gate_roles": [
+      "arena_promotion_gate",
+      "crucible_hardening_gate",
+      "covenant_policy_decision",
+      "foundry_goal_readiness",
+      "forge_packet_summary",
+      "ao2_run_summary",
+      "public_safety_scan",
+      "rollback_plan_ready"
+    ]
+  },
+  "current_active_stack": "../../active/valid/current-active-stack.json",
+  "required_gate_roles": [
+    "arena_promotion_gate",
+    "crucible_hardening_gate",
+    "covenant_policy_decision",
+    "foundry_goal_readiness",
+    "forge_packet_summary",
+    "ao2_run_summary",
+    "public_safety_scan",
+    "rollback_plan_ready"
+  ],
+  "evidence": [
+    {
+      "role": "arena_promotion_gate",
+      "path": "../../evidence/valid/arena-promotion-gate.json",
+      "schema_version": "ao.promoter.evidence-ref.v0.1",
+      "sha256": "087f1984c9ac8371dc37651322fcebdfd8075dd0a9936ef2c1a57672a61f47e4",
+      "status": "passed",
+      "candidate_id": "ao-foundry",
+      "created_at_utc": "2026-06-25T00:00:00Z",
+      "expires_at_utc": "2999-01-01T00:00:00Z",
+      "authority": "fixture"
+    },
+    {
+      "role": "crucible_hardening_gate",
+      "path": "../../evidence/valid/crucible-hardening-gate.json",
+      "schema_version": "ao.promoter.evidence-ref.v0.1",
+      "sha256": "c04413418c5e497fa953518335d496cabfec795fef58b9d5dc973b5bdcccbfff",
+      "status": "passed",
+      "candidate_id": "ao-foundry",
+      "created_at_utc": "2026-06-25T00:00:00Z",
+      "expires_at_utc": "2999-01-01T00:00:00Z",
+      "authority": "fixture"
+    },
+    {
+      "role": "covenant_policy_decision",
+      "path": "../../evidence/valid/covenant-policy-decision.json",
+      "schema_version": "ao.promoter.evidence-ref.v0.1",
+      "sha256": "23a42715551d22f4cfcd3d78335a7f055f2f9bdd16feda41b245e8dac99c8b66",
+      "status": "allowed",
+      "candidate_id": "ao-foundry",
+      "created_at_utc": "2026-06-25T00:00:00Z",
+      "expires_at_utc": "2999-01-01T00:00:00Z",
+      "authority": "fixture"
+    },
+    {
+      "role": "foundry_goal_readiness",
+      "path": "../../evidence/valid/foundry-goal-readiness.json",
+      "schema_version": "ao.promoter.evidence-ref.v0.1",
+      "sha256": "fcfae6dfb40b2c042b9bf9c6da8e1c66a741dd21983921da58f1e3fa4b4069d3",
+      "status": "ready",
+      "candidate_id": "ao-foundry",
+      "created_at_utc": "2026-06-25T00:00:00Z",
+      "expires_at_utc": "2999-01-01T00:00:00Z",
+      "authority": "fixture"
+    },
+    {
+      "role": "forge_packet_summary",
+      "path": "../../evidence/valid/forge-packet-summary.json",
+      "schema_version": "ao.promoter.evidence-ref.v0.1",
+      "sha256": "c503ec3d6f95c16fbea798959c613fbc1396e7b5f158f96e73ab018506e4cd10",
+      "status": "verified",
+      "candidate_id": "ao-foundry",
+      "created_at_utc": "2026-06-25T00:00:00Z",
+      "expires_at_utc": "2999-01-01T00:00:00Z",
+      "authority": "fixture"
+    },
+    {
+      "role": "ao2_run_summary",
+      "path": "../../evidence/valid/ao2-run-summary.json",
+      "schema_version": "ao.promoter.evidence-ref.v0.1",
+      "sha256": "785acc4be34b463ac70aad5bc06868a0dfc6d549f8a67423cc213fe704186168",
+      "status": "passed",
+      "candidate_id": "ao-foundry",
+      "created_at_utc": "2026-06-25T00:00:00Z",
+      "expires_at_utc": "2999-01-01T00:00:00Z",
+      "authority": "fixture"
+    },
+    {
+      "role": "public_safety_scan",
+      "path": "../../evidence/valid/public-safety-scan.json",
+      "schema_version": "ao.promoter.evidence-ref.v0.1",
+      "sha256": "db87acbaa60590c09d93282f80925bfaf23e798ec1dbfbd6dbb2b1b7432740d2",
+      "status": "passed",
+      "candidate_id": "ao-foundry",
+      "created_at_utc": "2026-06-25T00:00:00Z",
+      "expires_at_utc": "2999-01-01T00:00:00Z",
+      "authority": "fixture"
+    },
+    {
+      "role": "rollback_plan_ready",
+      "path": "../../evidence/valid/rollback-plan-ready.json",
+      "schema_version": "ao.promoter.evidence-ref.v0.1",
+      "sha256": "eea02978286190655b2525c7361b7a5bbed23daf75159d465386beb95680cff5",
+      "status": "ready",
+      "candidate_id": "ao-foundry",
+      "created_at_utc": "2026-06-25T00:00:00Z",
+      "expires_at_utc": "2999-01-01T00:00:00Z",
+      "authority": "fixture"
+    }
+  ],
+  "freshness_policy": {
+    "max_age_hours": 720
+  },
+  "promotion_policy": {
+    "require_all_gates": true,
+    "require_zero_safety_findings": true
+  },
+  "rollback_required": true,
+  "dry_run_only": true
+}

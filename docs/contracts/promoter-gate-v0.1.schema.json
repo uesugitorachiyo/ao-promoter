@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ao.local/contracts/promoter-gate-v0.1.schema.json",
+  "title": "AO Promoter Gate v0.1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "status",
+    "candidate_id",
+    "target_stack_id",
+    "gate_results",
+    "blockers",
+    "required_followups",
+    "promotion_allowed",
+    "activation_plan_allowed"
+  ],
+  "properties": {
+    "schema_version": { "const": "ao.promoter.gate.v0.1" },
+    "status": { "enum": ["passed", "failed"] },
+    "candidate_id": { "type": "string" },
+    "target_stack_id": { "type": "string" },
+    "gate_results": { "type": "array" },
+    "blockers": { "type": "array" },
+    "required_followups": { "type": "array" },
+    "promotion_allowed": { "type": "boolean" },
+    "activation_plan_allowed": { "type": "boolean" }
+  },
+  "additionalProperties": true
+}

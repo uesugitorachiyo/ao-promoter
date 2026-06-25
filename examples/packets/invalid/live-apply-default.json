@@ -1,0 +1,46 @@
+{
+  "schema_version": "ao.promoter.packet.v0.1",
+  "packet_id": "ao-promoter-live-apply-default",
+  "candidate": {
+    "schema_version": "ao.promoter.candidate.v0.1",
+    "candidate_id": "ao-foundry",
+    "display_name": "AO Foundry",
+    "component_kind": "factory",
+    "version": "v0.1.0",
+    "source_ref": "github.com/uesugitorachiyo/ao-foundry@v0.1.0",
+    "target_slot": "factory",
+    "target_stack_id": "ao-stack-local",
+    "trust_boundary": "public-preview-local",
+    "expected_gate_roles": [
+      "arena_promotion_gate",
+      "crucible_hardening_gate",
+      "covenant_policy_decision",
+      "foundry_goal_readiness",
+      "forge_packet_summary",
+      "ao2_run_summary",
+      "public_safety_scan",
+      "rollback_plan_ready"
+    ]
+  },
+  "current_active_stack": "../../active/valid/current-active-stack.json",
+  "required_gate_roles": [
+    "arena_promotion_gate",
+    "crucible_hardening_gate",
+    "covenant_policy_decision",
+    "foundry_goal_readiness",
+    "forge_packet_summary",
+    "ao2_run_summary",
+    "public_safety_scan",
+    "rollback_plan_ready"
+  ],
+  "evidence": [],
+  "freshness_policy": {
+    "max_age_hours": 720
+  },
+  "promotion_policy": {
+    "require_all_gates": true,
+    "require_zero_safety_findings": true
+  },
+  "rollback_required": true,
+  "dry_run_only": false
+}

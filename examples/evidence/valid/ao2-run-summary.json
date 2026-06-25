@@ -1,0 +1,9 @@
+{
+  "schema_version": "ao.promoter.evidence.v0.1",
+  "role": "ao2_run_summary",
+  "status": "passed",
+  "candidate_id": "ao-foundry",
+  "target_stack_id": "ao-stack-local",
+  "findings_count": 0,
+  "mutates_ao_artifacts": false
+}

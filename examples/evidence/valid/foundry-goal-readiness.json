@@ -1,0 +1,9 @@
+{
+  "schema_version": "ao.promoter.evidence.v0.1",
+  "role": "foundry_goal_readiness",
+  "status": "ready",
+  "candidate_id": "ao-foundry",
+  "target_stack_id": "ao-stack-local",
+  "findings_count": 0,
+  "goal_readiness_score": 100
+}

@@ -1,0 +1,8 @@
+{
+  "schema_version": "ao.promoter.evidence.v0.1",
+  "role": "forge_packet_summary",
+  "status": "verified",
+  "candidate_id": "ao-foundry",
+  "target_stack_id": "ao-stack-local",
+  "findings_count": 0
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ao.local/contracts/promoter-report-v0.1.schema.json",
+  "title": "AO Promoter Promotion Report v0.1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "candidate_id",
+    "target_stack_id",
+    "gate_status",
+    "dry_run_only",
+    "report_markdown"
+  ],
+  "properties": {
+    "schema_version": { "const": "ao.promoter.report.v0.1" },
+    "candidate_id": { "type": "string" },
+    "target_stack_id": { "type": "string" },
+    "gate_status": { "enum": ["passed", "failed"] },
+    "dry_run_only": { "type": "boolean" },
+    "report_markdown": { "type": "string" }
+  },
+  "additionalProperties": true
+}

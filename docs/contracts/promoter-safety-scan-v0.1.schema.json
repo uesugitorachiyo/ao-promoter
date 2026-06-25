@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ao.local/contracts/promoter-safety-scan-v0.1.schema.json",
+  "title": "AO Promoter Safety Scan v0.1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "status",
+    "path",
+    "findings_count",
+    "findings",
+    "scanned_at_utc"
+  ],
+  "properties": {
+    "schema_version": { "const": "ao.promoter.safety-scan.v0.1" },
+    "status": { "enum": ["passed", "failed"] },
+    "path": { "type": "string" },
+    "findings_count": { "type": "integer" },
+    "findings": { "type": "array" },
+    "scanned_at_utc": { "type": "string" }
+  },
+  "additionalProperties": true
+}

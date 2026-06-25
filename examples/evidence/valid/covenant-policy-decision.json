@@ -1,0 +1,9 @@
+{
+  "schema_version": "ao.promoter.evidence.v0.1",
+  "role": "covenant_policy_decision",
+  "status": "allowed",
+  "candidate_id": "ao-foundry",
+  "target_stack_id": "ao-stack-local",
+  "findings_count": 0,
+  "signature_status": "fixture-trusted"
+}

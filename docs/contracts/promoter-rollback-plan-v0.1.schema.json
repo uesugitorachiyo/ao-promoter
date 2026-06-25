@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ao.local/contracts/promoter-rollback-plan-v0.1.schema.json",
+  "title": "AO Promoter Rollback Plan v0.1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "rollback_id",
+    "candidate_id",
+    "target_stack_id",
+    "previous_component",
+    "restore_actions",
+    "verification_commands",
+    "dry_run_only",
+    "mutates_live_state"
+  ],
+  "properties": {
+    "schema_version": { "const": "ao.promoter.rollback-plan.v0.1" },
+    "rollback_id": { "type": "string" },
+    "candidate_id": { "type": "string" },
+    "target_stack_id": { "type": "string" },
+    "previous_component": { "type": "object" },
+    "restore_actions": { "type": "array" },
+    "verification_commands": { "type": "array" },
+    "dry_run_only": { "const": true },
+    "mutates_live_state": { "const": false }
+  },
+  "additionalProperties": true
+}

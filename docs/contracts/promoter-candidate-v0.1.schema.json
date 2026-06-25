@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ao.local/contracts/promoter-candidate-v0.1.schema.json",
+  "title": "AO Promoter Candidate v0.1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "candidate_id",
+    "display_name",
+    "component_kind",
+    "version",
+    "source_ref",
+    "target_slot",
+    "target_stack_id",
+    "trust_boundary",
+    "expected_gate_roles"
+  ],
+  "properties": {
+    "schema_version": { "const": "ao.promoter.candidate.v0.1" },
+    "candidate_id": { "type": "string", "minLength": 1 },
+    "display_name": { "type": "string", "minLength": 1 },
+    "component_kind": {
+      "enum": [
+        "factory",
+        "orchestrator",
+        "benchmark",
+        "hardening",
+        "policy",
+        "command_surface",
+        "control_plane",
+        "stack_revision"
+      ]
+    },
+    "version": { "type": "string", "minLength": 1 },
+    "source_ref": { "type": "string", "minLength": 1 },
+    "target_slot": {
+      "enum": [
+        "factory",
+        "orchestrator",
+        "benchmark",
+        "hardening",
+        "policy",
+        "command_surface",
+        "control_plane",
+        "release_gate"
+      ]
+    },
+    "target_stack_id": { "type": "string", "minLength": 1 },
+    "trust_boundary": { "type": "string", "minLength": 1 },
+    "expected_gate_roles": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 8
+    }
+  },
+  "additionalProperties": true
+}
