@@ -61,3 +61,7 @@ machine paths.
 Implement slice by slice. Keep v0.1 dry-run by default. A real active-stack
 mutation requires a future live profile, explicit operator approval, valid
 rollback plan, clean public-safety scan, and non-default command flag.
+
+## License
+
+AO Promoter is licensed under `Apache-2.0`. See `LICENSE`.
