@@ -35,6 +35,13 @@ machine-readable approval artifact with:
 
 v0.1 fixtures keep live apply disabled.
 
+The first docs-only live mutation boundary is narrower than general live apply.
+It requires exact-scope Covenant approval, Foundry approval-gate evidence,
+Forge guard evidence, an AO2 docs-only patch packet, Sentinel clear verdict,
+rollback execution rehearsal, and AO Command readback. A passing boundary is
+eligibility evidence for that exact docs-only PR rehearsal scope only; it is not
+authority to execute broad live mutation or approve future scopes.
+
 ## Public Safety Scan
 
 The scanner blocks:
@@ -62,4 +69,6 @@ Promotion fails when:
 - rollback planning fails;
 - dry-run guard is disabled;
 - live mutation is requested in v0.1;
+- first-docs-only live mutation evidence is missing exact approval, rollback,
+  public-safety, verification, Sentinel, or Command readback proof;
 - schema version is unknown.

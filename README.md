@@ -58,6 +58,10 @@ guard, AO2 docs-only patch packet, Sentinel clear verdict, Foundry rollback
 execution rehearsal, and AO Command readback. It still does not mutate
 repositories, execute work, approve work, call providers, release, upload, or
 publish, and it does not claim broad or fully unsupervised live mutation.
+The boundary output may support `safe_to_execute=true` only for the exact
+approved docs-only PR rehearsal scope. That value means every upstream gate has
+reported ready evidence; it is not a command to apply a patch, create a branch,
+merge a PR, or widen authority beyond the approved docs-only class.
 
 ## SDD Files
 
