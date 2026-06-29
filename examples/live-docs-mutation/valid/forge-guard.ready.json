@@ -1,0 +1,16 @@
+{
+  "schema_version": "ao.forge.live-docs-execution-guard.v0.1",
+  "status": "ready",
+  "first_live_class": "docs_only",
+  "docs_only_allowlist_enforced": true,
+  "rollback_plan_required": true,
+  "sentinel_no_hold_required": true,
+  "command_readback_required": true,
+  "mutates_live_state": false,
+  "mutates_repositories": false,
+  "schedules_work": false,
+  "executes_work": false,
+  "approves_work": false,
+  "provider_calls_allowed": false,
+  "release_or_publish_allowed": false
+}

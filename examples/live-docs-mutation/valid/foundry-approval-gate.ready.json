@@ -1,0 +1,15 @@
+{
+  "schema_version": "ao.foundry.live-docs-approval-gate.v0.1",
+  "status": "ready",
+  "safe_to_request": true,
+  "safe_to_execute": true,
+  "approval_state": "approved",
+  "first_live_class": "docs_only",
+  "mutates_live_state": false,
+  "mutates_repositories": false,
+  "schedules_work": false,
+  "executes_work": false,
+  "approves_work": false,
+  "provider_calls_allowed": false,
+  "release_or_publish_allowed": false
+}

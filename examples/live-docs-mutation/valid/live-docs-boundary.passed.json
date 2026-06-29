@@ -1,0 +1,21 @@
+{
+  "schema_version": "ao.promoter.live-docs-mutation-boundary.v0.1",
+  "status": "passed",
+  "first_live_class": "docs_only",
+  "gate_results": [],
+  "blockers": [],
+  "required_followups": [],
+  "live_docs_activation_allowed": true,
+  "safe_to_promote_first_docs_only_live_rehearsal": true,
+  "dry_run_only": true,
+  "mutates_live_state": false,
+  "mutates_repositories": false,
+  "schedules_work": false,
+  "executes_work": false,
+  "approves_work": false,
+  "provider_calls_allowed": false,
+  "release_or_publish_allowed": false,
+  "broad_live_mutation_allowed": false,
+  "fully_unsupervised_complex_mutation_claimed": false,
+  "evaluated_at_utc": "2026-06-29T00:00:00Z"
+}

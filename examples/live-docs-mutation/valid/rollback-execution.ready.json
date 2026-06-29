@@ -1,0 +1,14 @@
+{
+  "schema_version": "ao.foundry.live-docs-rollback-execution-rehearsal.v0.1",
+  "status": "ready",
+  "mode": "fixture_workspace_only",
+  "first_live_class": "docs_only",
+  "rollback_verified": true,
+  "mutates_live_state": false,
+  "mutates_repositories": false,
+  "schedules_work": false,
+  "executes_work": false,
+  "approves_work": false,
+  "provider_calls_allowed": false,
+  "release_or_publish_allowed": false
+}

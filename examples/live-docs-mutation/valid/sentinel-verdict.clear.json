@@ -1,0 +1,17 @@
+{
+  "schema_version": "ao.sentinel.live-docs-mutation-hold.v0.1",
+  "status": "clear",
+  "hold_required": false,
+  "promoter_hold_required": false,
+  "first_live_class": "docs_only",
+  "blockers": [],
+  "recommended_actions": [],
+  "operator_mode": "read_only",
+  "mutates_live_state": false,
+  "mutates_repositories": false,
+  "schedules_work": false,
+  "executes_work": false,
+  "approves_work": false,
+  "provider_calls_allowed": false,
+  "release_or_publish_allowed": false
+}

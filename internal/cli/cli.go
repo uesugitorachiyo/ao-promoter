@@ -113,6 +113,7 @@ Usage:
   promoter evidence inspect --packet <path>
   promoter safety scan --path <path> --out <json>
   promoter live-mutation boundary --authority <json> --foundry-request <json> --forge-plan <json> --ao2-packet <json> --sentinel-hold <json> --rollback <json> --command-status <json> --out <json>
+  promoter live-mutation docs-boundary --approval-ticket <json> --foundry-gate <json> --forge-guard <json> --ao2-packet <json> --sentinel-verdict <json> --rollback <json> --command-readback <json> --out <json>
 
 Commands: candidate packet gates plan active rollback report apply evidence safety live-mutation`)
 }
@@ -483,8 +484,14 @@ func runSafety(args []string, stdout io.Writer) error {
 }
 
 func runLiveMutation(args []string, stdout io.Writer) error {
-	if len(args) == 0 || args[0] != "boundary" {
-		return errors.New("live-mutation command requires boundary")
+	if len(args) == 0 {
+		return errors.New("live-mutation command requires boundary or docs-boundary")
+	}
+	if args[0] == "docs-boundary" {
+		return runLiveDocsMutationBoundary(args[1:], stdout)
+	}
+	if args[0] != "boundary" {
+		return errors.New("live-mutation command requires boundary or docs-boundary")
 	}
 	specs := []liveMutationBoundarySpec{
 		{Role: "covenant_authority", Flag: "--authority", Schema: "covenant.live-mutation-authority.v1", AcceptedStatus: "approved"},
@@ -517,6 +524,41 @@ func runLiveMutation(args []string, stdout io.Writer) error {
 		return err
 	}
 	fmt.Fprintf(stdout, "live-mutation boundary: %s\n", boundary["status"])
+	return nil
+}
+
+func runLiveDocsMutationBoundary(args []string, stdout io.Writer) error {
+	specs := []liveMutationBoundarySpec{
+		{Role: "approval_ticket", Flag: "--approval-ticket", Schema: "covenant.live-docs-approval-ticket.v1", AcceptedStatus: "approved"},
+		{Role: "foundry_approval_gate", Flag: "--foundry-gate", Schema: "ao.foundry.live-docs-approval-gate.v0.1", AcceptedStatus: "ready"},
+		{Role: "forge_execution_guard", Flag: "--forge-guard", Schema: "ao.forge.live-docs-execution-guard.v0.1", AcceptedStatus: "ready"},
+		{Role: "ao2_docs_patch_packet", Flag: "--ao2-packet", Schema: "ao2.docs-only-patch-packet.v1", AcceptedStatus: "ready"},
+		{Role: "sentinel_docs_hold_verdict", Flag: "--sentinel-verdict", Schema: "ao.sentinel.live-docs-mutation-hold.v0.1", AcceptedStatus: "clear"},
+		{Role: "rollback_execution_rehearsal", Flag: "--rollback", Schema: "ao.foundry.live-docs-rollback-execution-rehearsal.v0.1", AcceptedStatus: "ready"},
+		{Role: "command_readback", Flag: "--command-readback", Schema: "ao.command.live-docs-mutation-status.v0.1", AcceptedStatus: "ready"},
+	}
+	for i := range specs {
+		path, err := flagValue(args, specs[i].Flag)
+		if err != nil {
+			return err
+		}
+		specs[i].Path = path
+	}
+	out, err := flagValue(args, "--out")
+	if err != nil {
+		return err
+	}
+	if err := requireTmpOutput(out); err != nil {
+		return err
+	}
+	boundary, err := evaluateLiveDocsMutationBoundary(specs)
+	if err != nil {
+		return err
+	}
+	if err := writeJSON(out, boundary); err != nil {
+		return err
+	}
+	fmt.Fprintf(stdout, "live-docs mutation boundary: %s\n", boundary["status"])
 	return nil
 }
 
@@ -595,6 +637,113 @@ func evaluateLiveMutationBoundary(specs []liveMutationBoundarySpec) (map[string]
 		"first_tiny_live_class_still_gated": true,
 		"evaluated_at_utc":                  nowUTC(),
 	}, nil
+}
+
+func evaluateLiveDocsMutationBoundary(specs []liveMutationBoundarySpec) (map[string]any, error) {
+	blockers := []blocker{}
+	results := []map[string]any{}
+	for _, spec := range specs {
+		raw, err := readJSONMap(spec.Path)
+		if err != nil {
+			return nil, fmt.Errorf("read %s: %w", spec.Role, err)
+		}
+		sha, err := sha256File(spec.Path)
+		if err != nil {
+			return nil, fmt.Errorf("hash %s: %w", spec.Role, err)
+		}
+		status := liveMutationStatus(spec.Role, raw)
+		passed := true
+		if stringField(raw, "schema_version") != spec.Schema {
+			passed = false
+			blockers = append(blockers, newBlocker(spec.Role, "critical", "schema mismatch", spec.Path, "attach the expected first live docs evidence schema"))
+		}
+		if status != spec.AcceptedStatus {
+			passed = false
+			blockers = append(blockers, newBlocker(spec.Role, "critical", "status is not accepted", spec.Path, "repair first live docs evidence before activation boundary"))
+		}
+		if err := rejectLiveMutationAuthorityExpansion(spec.Role, raw); err != nil {
+			passed = false
+			blockers = append(blockers, newBlocker(spec.Role, "critical", err.Error(), spec.Path, "keep first live docs promotion boundary dry-run and read-only"))
+		}
+		if err := validateLiveDocsRole(spec.Role, raw); err != nil {
+			passed = false
+			blockers = append(blockers, newBlocker(spec.Role, "critical", err.Error(), spec.Path, "repair exact docs-only approval evidence before boundary can pass"))
+		}
+		results = append(results, map[string]any{
+			"role":            spec.Role,
+			"path":            filepath.ToSlash(spec.Path),
+			"schema_version":  stringField(raw, "schema_version"),
+			"status":          status,
+			"accepted_status": spec.AcceptedStatus,
+			"sha256":          sha,
+			"passed":          passed,
+		})
+	}
+	status := "passed"
+	if len(blockers) > 0 {
+		status = "failed"
+	}
+	return map[string]any{
+		"schema_version":               "ao.promoter.live-docs-mutation-boundary.v0.1",
+		"status":                       status,
+		"first_live_class":             "docs_only",
+		"gate_results":                 results,
+		"blockers":                     blockers,
+		"required_followups":           followups(blockers),
+		"live_docs_activation_allowed": len(blockers) == 0,
+		"safe_to_promote_first_docs_only_live_rehearsal": len(blockers) == 0,
+		"dry_run_only":                                true,
+		"mutates_live_state":                          false,
+		"mutates_repositories":                        false,
+		"schedules_work":                              false,
+		"executes_work":                               false,
+		"approves_work":                               false,
+		"provider_calls_allowed":                      false,
+		"release_or_publish_allowed":                  false,
+		"broad_live_mutation_allowed":                 false,
+		"fully_unsupervised_complex_mutation_claimed": false,
+		"evaluated_at_utc":                            nowUTC(),
+	}, nil
+}
+
+func validateLiveDocsRole(role string, raw map[string]any) error {
+	switch role {
+	case "approval_ticket":
+		if stringField(raw, "change_class") != "docs_only" && stringField(raw, "scope") != "docs_only" {
+			return errors.New("approval ticket must be exact docs-only scope")
+		}
+		if boolField(raw, "consumed") {
+			return errors.New("approval ticket must be unconsumed")
+		}
+		if stringField(raw, "approver") == "" {
+			return errors.New("approval ticket must include approver identity")
+		}
+	case "foundry_approval_gate":
+		if !boolField(raw, "safe_to_execute") {
+			return errors.New("Foundry approval gate must set safe_to_execute")
+		}
+	case "forge_execution_guard":
+		if !boolField(raw, "docs_only_allowlist_enforced") || !boolField(raw, "rollback_plan_required") {
+			return errors.New("Forge guard must enforce docs-only allowlist and rollback")
+		}
+	case "ao2_docs_patch_packet":
+		if !boolField(raw, "dry_run_apply") || !boolField(raw, "rollback_patch_present") {
+			return errors.New("AO2 docs patch packet must include dry-run apply and rollback patch evidence")
+		}
+	case "sentinel_docs_hold_verdict":
+		if boolField(raw, "hold_required") || boolField(raw, "promoter_hold_required") {
+			return errors.New("Sentinel docs hold must be clear")
+		}
+	case "rollback_execution_rehearsal":
+		if !boolField(raw, "rollback_verified") {
+			return errors.New("rollback execution rehearsal must verify rollback")
+		}
+	case "command_readback":
+		if stringField(raw, "operator_mode") != "read_only" || stringField(raw, "kill_switch_state") != "armed" {
+			return errors.New("Command readback must be read-only with armed kill-switch")
+		}
+	}
+	return nil
 }
 
 func liveMutationStatus(role string, raw map[string]any) string {

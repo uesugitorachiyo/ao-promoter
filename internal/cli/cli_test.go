@@ -17,7 +17,7 @@ func TestHelpListsExpectedCommandsAndUnknownCommandFails(t *testing.T) {
 	if code := Run([]string{"--help"}, &out, &err); code != 0 {
 		t.Fatalf("help exit code = %d, stderr = %s", code, err.String())
 	}
-	for _, want := range []string{"candidate", "packet", "gates", "plan", "active", "rollback", "report", "apply", "evidence", "safety", "live-mutation"} {
+	for _, want := range []string{"candidate", "packet", "gates", "plan", "active", "rollback", "report", "apply", "evidence", "safety", "live-mutation", "docs-boundary"} {
 		if !strings.Contains(out.String(), want) {
 			t.Fatalf("help output missing %q:\n%s", want, out.String())
 		}
@@ -191,6 +191,42 @@ func TestLiveMutationBoundary(t *testing.T) {
 	}
 }
 
+func TestLiveDocsMutationBoundary(t *testing.T) {
+	f := newFixtureSet(t)
+	paths := f.liveDocsMutationEvidencePaths(t, false, false)
+	outPath := filepath.Join(f.tmp, "live-docs-boundary.json")
+	assertRunOK(t, liveDocsMutationBoundaryArgs(paths, outPath))
+	boundary := readMap(t, outPath)
+	if boundary["schema_version"] != "ao.promoter.live-docs-mutation-boundary.v0.1" ||
+		boundary["status"] != "passed" ||
+		boundary["first_live_class"] != "docs_only" ||
+		boundary["live_docs_activation_allowed"] != true ||
+		boundary["safe_to_promote_first_docs_only_live_rehearsal"] != true ||
+		boundary["mutates_repositories"] != false ||
+		boundary["fully_unsupervised_complex_mutation_claimed"] != false {
+		t.Fatalf("unexpected live docs mutation boundary: %#v", boundary)
+	}
+	if len(boundary["gate_results"].([]any)) != 7 {
+		t.Fatalf("docs boundary should include seven gate results: %#v", boundary["gate_results"])
+	}
+
+	holdPaths := f.liveDocsMutationEvidencePaths(t, true, false)
+	holdOut := filepath.Join(f.tmp, "live-docs-boundary-hold.json")
+	assertRunOK(t, liveDocsMutationBoundaryArgs(holdPaths, holdOut))
+	hold := readMap(t, holdOut)
+	if hold["status"] != "failed" || hold["live_docs_activation_allowed"] != false {
+		t.Fatalf("Sentinel docs hold should block boundary: %#v", hold)
+	}
+
+	forbiddenPaths := f.liveDocsMutationEvidencePaths(t, false, true)
+	forbiddenOut := filepath.Join(f.tmp, "live-docs-boundary-forbidden.json")
+	assertRunOK(t, liveDocsMutationBoundaryArgs(forbiddenPaths, forbiddenOut))
+	forbidden := readMap(t, forbiddenOut)
+	if forbidden["status"] != "failed" || forbidden["safe_to_promote_first_docs_only_live_rehearsal"] != false {
+		t.Fatalf("forbidden docs authority should fail boundary: %#v", forbidden)
+	}
+}
+
 func liveMutationBoundaryArgs(paths map[string]string, out string) []string {
 	return []string{
 		"live-mutation", "boundary",
@@ -205,16 +241,36 @@ func liveMutationBoundaryArgs(paths map[string]string, out string) []string {
 	}
 }
 
+func liveDocsMutationBoundaryArgs(paths map[string]string, out string) []string {
+	return []string{
+		"live-mutation", "docs-boundary",
+		"--approval-ticket", paths["approval"],
+		"--foundry-gate", paths["foundry"],
+		"--forge-guard", paths["forge"],
+		"--ao2-packet", paths["ao2"],
+		"--sentinel-verdict", paths["sentinel"],
+		"--rollback", paths["rollback"],
+		"--command-readback", paths["command"],
+		"--out", out,
+	}
+}
+
 func TestCheckedInExamplesAreCovered(t *testing.T) {
 	root := filepath.Join("..", "..")
 
 	assertRunOK(t, []string{"candidate", "validate", "--candidate", filepath.Join(root, "examples/candidates/valid/ao-foundry-candidate.json")})
 	assertRunOK(t, []string{"packet", "validate", "--packet", filepath.Join(root, "examples/packets/valid/ao-promoter-v0.1.json")})
 	assertRunOK(t, []string{"live-mutation", "boundary", "--authority", filepath.Join(root, "examples/live-mutation/valid/covenant-authority.approved.json"), "--foundry-request", filepath.Join(root, "examples/live-mutation/valid/foundry-request.ready.json"), "--forge-plan", filepath.Join(root, "examples/live-mutation/valid/forge-plan.ready.json"), "--ao2-packet", filepath.Join(root, "examples/live-mutation/valid/ao2-packet.ready.json"), "--sentinel-hold", filepath.Join(root, "examples/live-mutation/valid/sentinel-hold.clear.json"), "--rollback", filepath.Join(root, "examples/live-mutation/valid/rollback-rehearsal.ready.json"), "--command-status", filepath.Join(root, "examples/live-mutation/valid/command-status.ready.json"), "--out", filepath.Join(root, "tmp/checked-in-live-mutation-boundary.json")})
+	assertRunOK(t, []string{"live-mutation", "docs-boundary", "--approval-ticket", filepath.Join(root, "examples/live-docs-mutation/valid/approval-ticket.approved.json"), "--foundry-gate", filepath.Join(root, "examples/live-docs-mutation/valid/foundry-approval-gate.ready.json"), "--forge-guard", filepath.Join(root, "examples/live-docs-mutation/valid/forge-guard.ready.json"), "--ao2-packet", filepath.Join(root, "examples/live-docs-mutation/valid/ao2-docs-packet.ready.json"), "--sentinel-verdict", filepath.Join(root, "examples/live-docs-mutation/valid/sentinel-verdict.clear.json"), "--rollback", filepath.Join(root, "examples/live-docs-mutation/valid/rollback-execution.ready.json"), "--command-readback", filepath.Join(root, "examples/live-docs-mutation/valid/command-readback.ready.json"), "--out", filepath.Join(root, "tmp/checked-in-live-docs-boundary.json")})
 	invalidBoundaryPath := filepath.Join(root, "tmp/checked-in-invalid-live-mutation-boundary.json")
 	assertRunOK(t, []string{"live-mutation", "boundary", "--authority", filepath.Join(root, "examples/live-mutation/valid/covenant-authority.approved.json"), "--foundry-request", filepath.Join(root, "examples/live-mutation/valid/foundry-request.ready.json"), "--forge-plan", filepath.Join(root, "examples/live-mutation/valid/forge-plan.ready.json"), "--ao2-packet", filepath.Join(root, "examples/live-mutation/invalid/ao2-packet.forbidden-authority.json"), "--sentinel-hold", filepath.Join(root, "examples/live-mutation/valid/sentinel-hold.clear.json"), "--rollback", filepath.Join(root, "examples/live-mutation/valid/rollback-rehearsal.ready.json"), "--command-status", filepath.Join(root, "examples/live-mutation/valid/command-status.ready.json"), "--out", invalidBoundaryPath})
 	if invalidBoundary := readMap(t, invalidBoundaryPath); invalidBoundary["status"] != "failed" {
 		t.Fatalf("forbidden live-mutation authority should emit failed boundary: %#v", invalidBoundary)
+	}
+	invalidDocsBoundaryPath := filepath.Join(root, "tmp/checked-in-invalid-live-docs-boundary.json")
+	assertRunOK(t, []string{"live-mutation", "docs-boundary", "--approval-ticket", filepath.Join(root, "examples/live-docs-mutation/valid/approval-ticket.approved.json"), "--foundry-gate", filepath.Join(root, "examples/live-docs-mutation/valid/foundry-approval-gate.ready.json"), "--forge-guard", filepath.Join(root, "examples/live-docs-mutation/valid/forge-guard.ready.json"), "--ao2-packet", filepath.Join(root, "examples/live-docs-mutation/invalid/ao2-docs-packet.forbidden-authority.json"), "--sentinel-verdict", filepath.Join(root, "examples/live-docs-mutation/valid/sentinel-verdict.clear.json"), "--rollback", filepath.Join(root, "examples/live-docs-mutation/valid/rollback-execution.ready.json"), "--command-readback", filepath.Join(root, "examples/live-docs-mutation/valid/command-readback.ready.json"), "--out", invalidDocsBoundaryPath})
+	if invalidDocsBoundary := readMap(t, invalidDocsBoundaryPath); invalidDocsBoundary["status"] != "failed" {
+		t.Fatalf("forbidden live-docs authority should emit failed boundary: %#v", invalidDocsBoundary)
 	}
 
 	cases := []struct {
@@ -449,6 +505,95 @@ func (f fixtureSet) liveMutationEvidencePaths(t *testing.T, sentinelHold bool, f
 		"sentinel":  f.writeJSON("live-sentinel.json", sentinel),
 		"rollback":  f.writeJSON("live-rollback.json", rollback),
 		"command":   f.writeJSON("live-command.json", command),
+	}
+}
+
+func (f fixtureSet) liveDocsMutationEvidencePaths(t *testing.T, sentinelHold bool, forbiddenAuthority bool) map[string]string {
+	t.Helper()
+	approval := map[string]any{
+		"schema_version":       "covenant.live-docs-approval-ticket.v1",
+		"status":               "approved",
+		"change_class":         "docs_only",
+		"scope":                "docs_only",
+		"approver":             "operator-fixture",
+		"consumed":             false,
+		"mutates_live_state":   false,
+		"mutates_repositories": false,
+	}
+	foundry := map[string]any{
+		"schema_version":       "ao.foundry.live-docs-approval-gate.v0.1",
+		"status":               "ready",
+		"safe_to_execute":      true,
+		"mutates_live_state":   false,
+		"mutates_repositories": false,
+	}
+	forge := map[string]any{
+		"schema_version":                  "ao.forge.live-docs-execution-guard.v0.1",
+		"status":                          "ready",
+		"docs_only_allowlist_enforced":    true,
+		"rollback_plan_required":          true,
+		"mutates_live_state":              false,
+		"mutates_repositories":            false,
+		"schedules_work":                  false,
+		"executes_work":                   false,
+		"approves_work":                   false,
+		"provider_calls_allowed":          false,
+		"release_or_publish_allowed":      false,
+		"broad_live_mutation_allowed":     false,
+		"ungated_live_mutation_requested": false,
+	}
+	ao2 := map[string]any{
+		"schema_version":             "ao2.docs-only-patch-packet.v1",
+		"status":                     "ready",
+		"dry_run_apply":              true,
+		"rollback_patch_present":     true,
+		"mutates_live_state":         false,
+		"mutates_repositories":       false,
+		"schedules_work":             false,
+		"executes_work":              false,
+		"approves_work":              false,
+		"provider_calls_allowed":     false,
+		"release_or_publish_allowed": false,
+	}
+	sentinel := map[string]any{
+		"schema_version":         "ao.sentinel.live-docs-mutation-hold.v0.1",
+		"status":                 "clear",
+		"hold_required":          false,
+		"promoter_hold_required": false,
+		"mutates_live_state":     false,
+		"mutates_repositories":   false,
+	}
+	if sentinelHold {
+		sentinel["status"] = "hold"
+		sentinel["hold_required"] = true
+		sentinel["promoter_hold_required"] = true
+	}
+	rollback := map[string]any{
+		"schema_version":       "ao.foundry.live-docs-rollback-execution-rehearsal.v0.1",
+		"status":               "ready",
+		"rollback_verified":    true,
+		"mutates_live_state":   false,
+		"mutates_repositories": false,
+	}
+	command := map[string]any{
+		"schema_version":       "ao.command.live-docs-mutation-status.v0.1",
+		"status":               "ready",
+		"kill_switch_state":    "armed",
+		"operator_mode":        "read_only",
+		"mutates_live_state":   false,
+		"mutates_repositories": false,
+	}
+	if forbiddenAuthority {
+		ao2["mutates_repositories"] = true
+	}
+	return map[string]string{
+		"approval": f.writeJSON("live-docs-approval.json", approval),
+		"foundry":  f.writeJSON("live-docs-foundry.json", foundry),
+		"forge":    f.writeJSON("live-docs-forge.json", forge),
+		"ao2":      f.writeJSON("live-docs-ao2.json", ao2),
+		"sentinel": f.writeJSON("live-docs-sentinel.json", sentinel),
+		"rollback": f.writeJSON("live-docs-rollback.json", rollback),
+		"command":  f.writeJSON("live-docs-command.json", command),
 	}
 }
 

@@ -15,6 +15,7 @@
 | Safety scan | `docs/contracts/promoter-safety-scan-v0.1.schema.json` | Public-safety scan result and redacted findings. |
 | Promotion report | `docs/contracts/promoter-report-v0.1.schema.json` | Machine-readable report summary for Markdown rendering. |
 | Live mutation boundary | `docs/contracts/promoter-live-mutation-boundary-v0.1.schema.json` | Dry-run activation boundary for governed live-mutation readiness evidence. |
+| Live docs mutation boundary | `docs/contracts/promoter-live-docs-mutation-boundary-v0.1.schema.json` | Dry-run promotion boundary for the first approved docs-only live class. |
 
 ## Candidate Required Fields
 
@@ -83,6 +84,23 @@ The canonical v0.1 packet requires:
 The boundary output uses `ao.promoter.live-mutation-boundary.v0.1`. It remains
 dry-run only and must not mutate repositories, schedule work, execute work,
 approve work, call providers, release, or publish.
+
+## First Live Docs Boundary Required Evidence
+
+`promoter live-mutation docs-boundary` requires:
+
+- Covenant docs-only approval ticket with status `approved`, exact docs-only scope, approver identity, and `consumed=false`;
+- Foundry live docs approval gate with status `ready` and `safe_to_execute=true`;
+- Forge live docs execution guard with status `ready`, docs-only allowlist enforcement, and rollback requirement;
+- AO2 docs-only patch packet with status `ready`, dry-run apply evidence, and rollback patch evidence;
+- Sentinel live docs hold verdict with status `clear` and no hold;
+- Foundry rollback execution rehearsal with status `ready` and `rollback_verified=true`;
+- AO Command live docs readback with status `ready`, `operator_mode=read_only`, and armed kill-switch.
+
+The boundary output uses `ao.promoter.live-docs-mutation-boundary.v0.1`. It is
+still dry-run only: passing it does not mutate repositories, execute work,
+approve work, call providers, release, upload, or publish, and it does not claim
+broad or fully unsupervised complex mutation.
 
 ## Evidence Reference Required Fields
 
