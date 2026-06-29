@@ -82,6 +82,20 @@ Passing example:
 - Rollback status: `ready`;
 - Decision: `passed`.
 
+First docs-only live mutation boundary example:
+
+- Covenant docs-only approval ticket: `approved`, unexpired, exact-scope;
+- Foundry approval gate: `ready`;
+- Forge live-docs guard: `ready`;
+- AO2 docs-only patch packet: `ready`, with exact changed-file list and
+  rollback patch;
+- Sentinel verdict: `clear`;
+- Foundry rollback execution rehearsal: `ready`;
+- AO Command readback: `ready`, `operator_mode=read_only`;
+- Decision: `passed` for the exact approved docs-only PR rehearsal scope only.
+  The decision does not apply patches, create branches, publish, release, call
+  providers, or approve fully unsupervised complex live mutation.
+
 Failed example:
 
 - Crucible status: `failed`;
