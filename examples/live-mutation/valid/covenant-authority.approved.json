@@ -1,0 +1,17 @@
+{
+  "schema_version": "covenant.live-mutation-authority.v1",
+  "status": "approved",
+  "mode": "dry_run_only",
+  "scope": "docs_only_fixture",
+  "repo": "ao-foundry",
+  "allowed_path_class": "docs",
+  "rollback_plan_required": true,
+  "operator_kill_switch_required": true,
+  "mutates_live_state": false,
+  "mutates_repositories": false,
+  "schedules_work": false,
+  "executes_work": false,
+  "approves_work": false,
+  "provider_calls_allowed": false,
+  "release_or_publish_allowed": false
+}

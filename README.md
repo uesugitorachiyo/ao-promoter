@@ -30,11 +30,25 @@ PATH="$PWD/tmp/bin:$PATH" promoter active render --plan tmp/activation-plan.json
 PATH="$PWD/tmp/bin:$PATH" promoter rollback plan --active examples/active/valid/current-active-stack.json --candidate examples/candidates/valid/ao-foundry-candidate.json --out tmp/rollback-plan.json
 PATH="$PWD/tmp/bin:$PATH" promoter report render --gate tmp/promotion-gate.json --plan tmp/activation-plan.json --out tmp/promotion-report.md
 PATH="$PWD/tmp/bin:$PATH" promoter apply --plan tmp/activation-plan.json --dry-run --out tmp/apply-dry-run.json
+PATH="$PWD/tmp/bin:$PATH" promoter live-mutation boundary --authority examples/live-mutation/valid/covenant-authority.approved.json --foundry-request examples/live-mutation/valid/foundry-request.ready.json --forge-plan examples/live-mutation/valid/forge-plan.ready.json --ao2-packet examples/live-mutation/valid/ao2-packet.ready.json --sentinel-hold examples/live-mutation/valid/sentinel-hold.clear.json --rollback examples/live-mutation/valid/rollback-rehearsal.ready.json --command-status examples/live-mutation/valid/command-status.ready.json --out tmp/live-mutation-boundary.json
 PATH="$PWD/tmp/bin:$PATH" promoter safety scan --path README.md --out tmp/readme-scan.json
 PATH="$PWD/tmp/bin:$PATH" promoter safety scan --path docs --out tmp/docs-scan.json
 PATH="$PWD/tmp/bin:$PATH" promoter safety scan --path examples --out tmp/examples-scan.json
 git diff --check
 ```
+
+## Governed Live-Mutation Boundary
+
+`promoter live-mutation boundary` is a dry-run activation boundary for the
+future tiny live-mutation class. It requires Covenant authority, Foundry
+request evidence, Forge dry-run plan, AO2 dry-run packet, Sentinel hold verdict,
+rollback rehearsal, and AO Command readback. It fails closed when any upstream
+artifact is missing, not ready, on hold, not digest-bound, or claims scheduling,
+execution, approval, provider, release, or repository mutation authority.
+
+Passing this boundary does not perform live mutation and does not grant ungated
+authority. The first tiny live mutation class still requires explicit operator
+approval and a later governed request.
 
 ## SDD Files
 

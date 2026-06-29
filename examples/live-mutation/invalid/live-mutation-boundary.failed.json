@@ -1,0 +1,30 @@
+{
+  "schema_version": "ao.promoter.live-mutation-boundary.v0.1",
+  "status": "failed",
+  "gate_results": [],
+  "blockers": [
+    {
+      "blocker_id": "sentinel_hold_verdict_sentinel_hold_is_required",
+      "gate_role": "sentinel_hold_verdict",
+      "severity": "critical",
+      "reason": "Sentinel hold is required",
+      "evidence_path": "examples/live-mutation/invalid/sentinel-hold.required.json",
+      "recommended_action": "clear Sentinel hold before activation boundary can pass"
+    }
+  ],
+  "required_followups": [
+    "clear Sentinel hold before activation boundary can pass"
+  ],
+  "live_mutation_activation_allowed": false,
+  "dry_run_only": true,
+  "mutates_live_state": false,
+  "mutates_repositories": false,
+  "schedules_work": false,
+  "executes_work": false,
+  "approves_work": false,
+  "provider_calls_allowed": false,
+  "release_or_publish_allowed": false,
+  "operator_approval_still_required": true,
+  "first_tiny_live_class_still_gated": true,
+  "evaluated_at_utc": "2026-06-29T00:00:00Z"
+}

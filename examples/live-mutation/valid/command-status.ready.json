@@ -1,0 +1,15 @@
+{
+  "schema_version": "ao.command.live-mutation-status.v0.1",
+  "status": "ready",
+  "allowed_next_action": "request_first_tiny_live_mutation_class",
+  "kill_switch_state": "armed",
+  "operator_mode": "read_only",
+  "mutates_live_state": false,
+  "mutates_repositories": false,
+  "schedules_work": false,
+  "executes_work": false,
+  "approves_work": false,
+  "calls_providers": false,
+  "provider_calls_allowed": false,
+  "release_or_publish_allowed": false
+}

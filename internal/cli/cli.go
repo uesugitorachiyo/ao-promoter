@@ -86,6 +86,8 @@ func Run(args []string, stdout, stderr io.Writer) int {
 		err = runEvidence(args[1:], stdout)
 	case "safety":
 		err = runSafety(args[1:], stdout)
+	case "live-mutation":
+		err = runLiveMutation(args[1:], stdout)
 	default:
 		err = fmt.Errorf("unknown command %q", args[0])
 	}
@@ -110,8 +112,9 @@ Usage:
   promoter apply --plan <path> --dry-run --out <json>
   promoter evidence inspect --packet <path>
   promoter safety scan --path <path> --out <json>
+  promoter live-mutation boundary --authority <json> --foundry-request <json> --forge-plan <json> --ao2-packet <json> --sentinel-hold <json> --rollback <json> --command-status <json> --out <json>
 
-Commands: candidate packet gates plan active rollback report apply evidence safety`)
+Commands: candidate packet gates plan active rollback report apply evidence safety live-mutation`)
 }
 
 func runCandidate(args []string, stdout io.Writer) error {
@@ -477,6 +480,165 @@ func runSafety(args []string, stdout io.Writer) error {
 	}
 	fmt.Fprintln(stdout, "safety scan: passed")
 	return nil
+}
+
+func runLiveMutation(args []string, stdout io.Writer) error {
+	if len(args) == 0 || args[0] != "boundary" {
+		return errors.New("live-mutation command requires boundary")
+	}
+	specs := []liveMutationBoundarySpec{
+		{Role: "covenant_authority", Flag: "--authority", Schema: "covenant.live-mutation-authority.v1", AcceptedStatus: "approved"},
+		{Role: "foundry_request", Flag: "--foundry-request", Schema: "ao.foundry.live-mutation-request.v0.1", AcceptedStatus: "ready"},
+		{Role: "forge_dry_run_plan", Flag: "--forge-plan", Schema: "ao.forge.live-mutation-dry-run-plan.v0.1", AcceptedStatus: "ready"},
+		{Role: "ao2_dry_run_packet", Flag: "--ao2-packet", Schema: "ao2.live-mutation-dry-run-packet.v1", AcceptedStatus: "ready"},
+		{Role: "sentinel_hold_verdict", Flag: "--sentinel-hold", Schema: "ao.sentinel.live-mutation-hold.v0.1", AcceptedStatus: "clear"},
+		{Role: "rollback_rehearsal", Flag: "--rollback", Schema: "ao.foundry.live-mutation-rollback-rehearsal.v0.1", AcceptedStatus: "ready"},
+		{Role: "command_readback", Flag: "--command-status", Schema: "ao.command.live-mutation-status.v0.1", AcceptedStatus: "ready"},
+	}
+	for i := range specs {
+		path, err := flagValue(args[1:], specs[i].Flag)
+		if err != nil {
+			return err
+		}
+		specs[i].Path = path
+	}
+	out, err := flagValue(args[1:], "--out")
+	if err != nil {
+		return err
+	}
+	if err := requireTmpOutput(out); err != nil {
+		return err
+	}
+	boundary, err := evaluateLiveMutationBoundary(specs)
+	if err != nil {
+		return err
+	}
+	if err := writeJSON(out, boundary); err != nil {
+		return err
+	}
+	fmt.Fprintf(stdout, "live-mutation boundary: %s\n", boundary["status"])
+	return nil
+}
+
+type liveMutationBoundarySpec struct {
+	Role           string
+	Flag           string
+	Path           string
+	Schema         string
+	AcceptedStatus string
+}
+
+func evaluateLiveMutationBoundary(specs []liveMutationBoundarySpec) (map[string]any, error) {
+	blockers := []blocker{}
+	results := []map[string]any{}
+	for _, spec := range specs {
+		raw, err := readJSONMap(spec.Path)
+		if err != nil {
+			return nil, fmt.Errorf("read %s: %w", spec.Role, err)
+		}
+		sha, err := sha256File(spec.Path)
+		if err != nil {
+			return nil, fmt.Errorf("hash %s: %w", spec.Role, err)
+		}
+		status := liveMutationStatus(spec.Role, raw)
+		passed := true
+		if stringField(raw, "schema_version") != spec.Schema {
+			passed = false
+			blockers = append(blockers, newBlocker(spec.Role, "critical", "schema mismatch", spec.Path, "attach the expected live-mutation evidence schema"))
+		}
+		if status != spec.AcceptedStatus {
+			passed = false
+			blockers = append(blockers, newBlocker(spec.Role, "critical", "status is not accepted", spec.Path, "repair live-mutation evidence before activation"))
+		}
+		if err := rejectLiveMutationAuthorityExpansion(spec.Role, raw); err != nil {
+			passed = false
+			blockers = append(blockers, newBlocker(spec.Role, "critical", err.Error(), spec.Path, "keep live-mutation promotion boundary dry-run and read-only"))
+		}
+		if spec.Role == "sentinel_hold_verdict" && boolField(raw, "hold_required") {
+			passed = false
+			blockers = append(blockers, newBlocker(spec.Role, "critical", "Sentinel hold is required", spec.Path, "clear Sentinel hold before activation boundary can pass"))
+		}
+		if spec.Role == "command_readback" && stringField(raw, "kill_switch_state") != "armed" {
+			passed = false
+			blockers = append(blockers, newBlocker(spec.Role, "critical", "operator kill-switch is not armed", spec.Path, "arm operator kill-switch before activation boundary can pass"))
+		}
+		results = append(results, map[string]any{
+			"role":            spec.Role,
+			"path":            filepath.ToSlash(spec.Path),
+			"schema_version":  stringField(raw, "schema_version"),
+			"status":          status,
+			"accepted_status": spec.AcceptedStatus,
+			"sha256":          sha,
+			"passed":          passed,
+		})
+	}
+	status := "passed"
+	if len(blockers) > 0 {
+		status = "failed"
+	}
+	return map[string]any{
+		"schema_version":                    "ao.promoter.live-mutation-boundary.v0.1",
+		"status":                            status,
+		"gate_results":                      results,
+		"blockers":                          blockers,
+		"required_followups":                followups(blockers),
+		"live_mutation_activation_allowed":  len(blockers) == 0,
+		"dry_run_only":                      true,
+		"mutates_live_state":                false,
+		"mutates_repositories":              false,
+		"schedules_work":                    false,
+		"executes_work":                     false,
+		"approves_work":                     false,
+		"provider_calls_allowed":            false,
+		"release_or_publish_allowed":        false,
+		"operator_approval_still_required":  true,
+		"first_tiny_live_class_still_gated": true,
+		"evaluated_at_utc":                  nowUTC(),
+	}, nil
+}
+
+func liveMutationStatus(role string, raw map[string]any) string {
+	if role == "operator_kill_switch" {
+		return stringField(raw, "state")
+	}
+	return stringField(raw, "status")
+}
+
+func rejectLiveMutationAuthorityExpansion(label string, value any) error {
+	switch v := value.(type) {
+	case map[string]any:
+		for key, item := range v {
+			switch key {
+			case "mutates_live_state", "mutates_repositories", "schedules_work", "executes_work", "approves_work", "calls_providers", "provider_calls_allowed", "release_or_publish_allowed", "uploads_artifacts", "live_mutation_allowed":
+				if b, ok := item.(bool); ok && b {
+					return fmt.Errorf("%s expands forbidden authority via %s", label, key)
+				}
+			}
+			if err := rejectLiveMutationAuthorityExpansion(label+"."+key, item); err != nil {
+				return err
+			}
+		}
+	case []any:
+		for i, item := range v {
+			if err := rejectLiveMutationAuthorityExpansion(fmt.Sprintf("%s[%d]", label, i), item); err != nil {
+				return err
+			}
+		}
+	case string:
+		if containsUnsafePath(v) {
+			return fmt.Errorf("%s contains unsafe local path", label)
+		}
+	}
+	return nil
+}
+
+func containsUnsafePath(value string) bool {
+	for _, marker := range []string{"/" + "Users/", "/" + "home/", "C:" + `\` + "Users" + `\`, "/" + "tmp/", "/" + "var/folders/"} {
+		if strings.Contains(value, marker) {
+			return true
+		}
+	}
+	return false
 }
 
 func validateCandidate(candidate map[string]any) error {
