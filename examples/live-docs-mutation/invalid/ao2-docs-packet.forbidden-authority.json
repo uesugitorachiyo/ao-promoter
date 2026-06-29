@@ -1,0 +1,21 @@
+{
+  "schema_version": "ao2.docs-only-patch-packet.v1",
+  "status": "ready",
+  "mode": "dry_run_only",
+  "first_live_class": "docs_only",
+  "dry_run_apply": true,
+  "rollback_patch_present": true,
+  "changed_file_plan": [
+    "docs/operations/FIRST-LIVE-DOCS-REHEARSAL.md"
+  ],
+  "verification_plan": [
+    "go test ./... -count=1"
+  ],
+  "mutates_live_state": false,
+  "mutates_repositories": true,
+  "schedules_work": false,
+  "executes_work": false,
+  "approves_work": false,
+  "provider_calls_allowed": false,
+  "release_or_publish_allowed": false
+}

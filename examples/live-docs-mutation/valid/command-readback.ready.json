@@ -1,0 +1,16 @@
+{
+  "schema_version": "ao.command.live-docs-mutation-status.v0.1",
+  "status": "ready",
+  "allowed_next_action": "promote_first_docs_only_live_rehearsal_boundary",
+  "kill_switch_state": "armed",
+  "operator_mode": "read_only",
+  "first_live_class": "docs_only",
+  "mutates_live_state": false,
+  "mutates_repositories": false,
+  "schedules_work": false,
+  "executes_work": false,
+  "approves_work": false,
+  "calls_providers": false,
+  "provider_calls_allowed": false,
+  "release_or_publish_allowed": false
+}

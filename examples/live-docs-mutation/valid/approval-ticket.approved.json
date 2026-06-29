@@ -1,0 +1,19 @@
+{
+  "schema_version": "covenant.live-docs-approval-ticket.v1",
+  "status": "approved",
+  "ticket_id": "first-live-docs-ticket",
+  "request_id": "first-live-docs-request",
+  "change_class": "docs_only",
+  "scope": "docs_only",
+  "repo": "ao-foundry",
+  "approver": "operator-fixture",
+  "consumed": false,
+  "expires_at_utc": "2999-01-01T00:00:00Z",
+  "mutates_live_state": false,
+  "mutates_repositories": false,
+  "schedules_work": false,
+  "executes_work": false,
+  "approves_work": false,
+  "provider_calls_allowed": false,
+  "release_or_publish_allowed": false
+}

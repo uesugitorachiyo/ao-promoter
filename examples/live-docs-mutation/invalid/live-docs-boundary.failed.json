@@ -1,0 +1,32 @@
+{
+  "schema_version": "ao.promoter.live-docs-mutation-boundary.v0.1",
+  "status": "failed",
+  "first_live_class": "docs_only",
+  "gate_results": [],
+  "blockers": [
+    {
+      "blocker_id": "sentinel_docs_hold_verdict_status_is_not_accepted",
+      "gate_role": "sentinel_docs_hold_verdict",
+      "severity": "critical",
+      "reason": "status is not accepted",
+      "evidence_path": "examples/live-docs-mutation/invalid/sentinel-verdict.hold.json",
+      "recommended_action": "repair first live docs evidence before activation boundary"
+    }
+  ],
+  "required_followups": [
+    "repair first live docs evidence before activation boundary"
+  ],
+  "live_docs_activation_allowed": false,
+  "safe_to_promote_first_docs_only_live_rehearsal": false,
+  "dry_run_only": true,
+  "mutates_live_state": false,
+  "mutates_repositories": false,
+  "schedules_work": false,
+  "executes_work": false,
+  "approves_work": false,
+  "provider_calls_allowed": false,
+  "release_or_publish_allowed": false,
+  "broad_live_mutation_allowed": false,
+  "fully_unsupervised_complex_mutation_claimed": false,
+  "evaluated_at_utc": "2026-06-29T00:00:00Z"
+}

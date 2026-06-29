@@ -36,6 +36,7 @@ PATH="$PWD/tmp/bin:$PATH" promoter active render --plan tmp/activation-plan.json
 PATH="$PWD/tmp/bin:$PATH" promoter rollback plan --active examples/active/valid/current-active-stack.json --candidate examples/candidates/valid/ao-foundry-candidate.json --out tmp/rollback-plan.json
 PATH="$PWD/tmp/bin:$PATH" promoter report render --gate tmp/promotion-gate.json --plan tmp/activation-plan.json --out tmp/promotion-report.md
 PATH="$PWD/tmp/bin:$PATH" promoter apply --plan tmp/activation-plan.json --dry-run --out tmp/apply-dry-run.json
+PATH="$PWD/tmp/bin:$PATH" promoter live-mutation docs-boundary --approval-ticket examples/live-docs-mutation/valid/approval-ticket.approved.json --foundry-gate examples/live-docs-mutation/valid/foundry-approval-gate.ready.json --forge-guard examples/live-docs-mutation/valid/forge-guard.ready.json --ao2-packet examples/live-docs-mutation/valid/ao2-docs-packet.ready.json --sentinel-verdict examples/live-docs-mutation/valid/sentinel-verdict.clear.json --rollback examples/live-docs-mutation/valid/rollback-execution.ready.json --command-readback examples/live-docs-mutation/valid/command-readback.ready.json --out tmp/live-docs-boundary.json
 PATH="$PWD/tmp/bin:$PATH" promoter safety scan --path README.md --out tmp/readme-scan.json
 PATH="$PWD/tmp/bin:$PATH" promoter safety scan --path docs --out tmp/docs-scan.json
 PATH="$PWD/tmp/bin:$PATH" promoter safety scan --path examples --out tmp/examples-scan.json

@@ -1,0 +1,26 @@
+{
+  "schema_version": "ao.sentinel.live-docs-mutation-hold.v0.1",
+  "status": "hold",
+  "hold_required": true,
+  "promoter_hold_required": true,
+  "first_live_class": "docs_only",
+  "blockers": [
+    {
+      "blocker_id": "rollback_rehearsal_missing",
+      "severity": "critical",
+      "reason": "required live docs rollback evidence is missing",
+      "recommended_action": "provide digest-bound rollback execution rehearsal"
+    }
+  ],
+  "recommended_actions": [
+    "provide digest-bound rollback execution rehearsal"
+  ],
+  "operator_mode": "read_only",
+  "mutates_live_state": false,
+  "mutates_repositories": false,
+  "schedules_work": false,
+  "executes_work": false,
+  "approves_work": false,
+  "provider_calls_allowed": false,
+  "release_or_publish_allowed": false
+}
