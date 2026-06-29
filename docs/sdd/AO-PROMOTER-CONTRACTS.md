@@ -14,6 +14,7 @@
 | Apply result | `docs/contracts/promoter-apply-result-v0.1.schema.json` | Dry-run apply summary and mutation flag. |
 | Safety scan | `docs/contracts/promoter-safety-scan-v0.1.schema.json` | Public-safety scan result and redacted findings. |
 | Promotion report | `docs/contracts/promoter-report-v0.1.schema.json` | Machine-readable report summary for Markdown rendering. |
+| Live mutation boundary | `docs/contracts/promoter-live-mutation-boundary-v0.1.schema.json` | Dry-run activation boundary for governed live-mutation readiness evidence. |
 
 ## Candidate Required Fields
 
@@ -67,6 +68,22 @@ The canonical v0.1 packet requires:
 - `public_safety_scan`;
 - `rollback_plan_ready`.
 
+## Live Mutation Boundary Required Evidence
+
+`promoter live-mutation boundary` requires:
+
+- Covenant live-mutation authority with status `approved`;
+- Foundry live-mutation request packet with status `ready`;
+- Forge live-mutation dry-run plan with status `ready`;
+- AO2 live-mutation dry-run packet with status `ready`;
+- Sentinel live-mutation hold verdict with status `clear` and no hold;
+- rollback rehearsal with status `ready`;
+- AO Command live-mutation readback with status `ready` and armed kill-switch.
+
+The boundary output uses `ao.promoter.live-mutation-boundary.v0.1`. It remains
+dry-run only and must not mutate repositories, schedule work, execute work,
+approve work, call providers, release, or publish.
+
 ## Evidence Reference Required Fields
 
 - `role`;
@@ -100,6 +117,14 @@ Allowed statuses:
 - `examples/evidence/valid/forge-packet-summary.json`
 - `examples/evidence/valid/ao2-run-summary.json`
 - `examples/evidence/valid/public-safety-scan.json`
+- `examples/live-mutation/valid/live-mutation-boundary.passed.json`
+- `examples/live-mutation/valid/covenant-authority.approved.json`
+- `examples/live-mutation/valid/foundry-request.ready.json`
+- `examples/live-mutation/valid/forge-plan.ready.json`
+- `examples/live-mutation/valid/ao2-packet.ready.json`
+- `examples/live-mutation/valid/sentinel-hold.clear.json`
+- `examples/live-mutation/valid/rollback-rehearsal.ready.json`
+- `examples/live-mutation/valid/command-status.ready.json`
 
 ## Invalid Fixtures
 
@@ -111,6 +136,9 @@ Allowed statuses:
 - `examples/evidence/invalid/failed-crucible-gate.json`
 - `examples/evidence/invalid/unsafe-public-scan.json`
 - `examples/candidates/invalid/unknown-target-slot.json`
+- `examples/live-mutation/invalid/live-mutation-boundary.failed.json`
+- `examples/live-mutation/invalid/sentinel-hold.required.json`
+- `examples/live-mutation/invalid/ao2-packet.forbidden-authority.json`
 
 ## Validation Rules
 
@@ -123,3 +151,6 @@ Allowed statuses:
 - Reject `dry_run_only: false` in v0.1 default fixtures.
 - Reject promotion when rollback is required but no rollback plan can be built.
 - Reject local absolute paths and secret-like values in durable examples.
+- Reject live-mutation activation when Sentinel holds, Command kill-switch is
+  not armed, rollback evidence is missing, or any input expands mutation,
+  scheduling, execution, approval, provider, release, or publication authority.

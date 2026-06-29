@@ -1,0 +1,19 @@
+{
+  "schema_version": "ao.promoter.live-mutation-boundary.v0.1",
+  "status": "passed",
+  "gate_results": [],
+  "blockers": [],
+  "required_followups": [],
+  "live_mutation_activation_allowed": true,
+  "dry_run_only": true,
+  "mutates_live_state": false,
+  "mutates_repositories": false,
+  "schedules_work": false,
+  "executes_work": false,
+  "approves_work": false,
+  "provider_calls_allowed": false,
+  "release_or_publish_allowed": false,
+  "operator_approval_still_required": true,
+  "first_tiny_live_class_still_gated": true,
+  "evaluated_at_utc": "2026-06-29T00:00:00Z"
+}

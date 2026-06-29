@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ao.local/contracts/promoter-live-mutation-boundary-v0.1.schema.json",
+  "title": "AO Promoter Live Mutation Boundary v0.1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "status",
+    "gate_results",
+    "blockers",
+    "required_followups",
+    "live_mutation_activation_allowed",
+    "dry_run_only",
+    "mutates_live_state",
+    "mutates_repositories",
+    "schedules_work",
+    "executes_work",
+    "approves_work",
+    "provider_calls_allowed",
+    "release_or_publish_allowed",
+    "operator_approval_still_required",
+    "first_tiny_live_class_still_gated"
+  ],
+  "properties": {
+    "schema_version": { "const": "ao.promoter.live-mutation-boundary.v0.1" },
+    "status": { "enum": ["passed", "failed"] },
+    "gate_results": { "type": "array" },
+    "blockers": { "type": "array" },
+    "required_followups": { "type": "array" },
+    "live_mutation_activation_allowed": { "type": "boolean" },
+    "dry_run_only": { "const": true },
+    "mutates_live_state": { "const": false },
+    "mutates_repositories": { "const": false },
+    "schedules_work": { "const": false },
+    "executes_work": { "const": false },
+    "approves_work": { "const": false },
+    "provider_calls_allowed": { "const": false },
+    "release_or_publish_allowed": { "const": false },
+    "operator_approval_still_required": { "const": true },
+    "first_tiny_live_class_still_gated": { "const": true }
+  },
+  "additionalProperties": true
+}
