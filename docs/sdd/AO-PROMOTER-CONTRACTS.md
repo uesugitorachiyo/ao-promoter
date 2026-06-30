@@ -89,6 +89,13 @@ The boundary output uses `ao.promoter.live-mutation-boundary.v0.1` and includes
 requires the next class to be the immediate governed successor; skipped classes
 are denied. It remains dry-run only and must not mutate repositories, schedule
 work, execute work, approve work, call providers, release, or publish.
+For the `test_only` to `low_risk_code` successor, `class_promotion_readiness`
+also includes `promotion_prerequisites` and
+`promotion_prerequisite_requirements`. These require successful `test_only`
+live evidence, a `test_only` rollback fixture, Sentinel clear verdict for
+`low_risk_code`, clean `main` CI, an exact `low_risk_code` Covenant class
+ticket, and read-only AO Command status. A wrong-class Covenant ticket denies
+promotion even when all other dry-run evidence is ready.
 
 ## First Live Docs Boundary Required Evidence
 

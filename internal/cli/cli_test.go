@@ -356,6 +356,41 @@ func TestCheckedInExamplesAreCovered(t *testing.T) {
 		lowRiskBoundary["dry_run_only"] != true {
 		t.Fatalf("checked-in low_risk_code promotion boundary should pass as dry-run readiness: %#v", lowRiskBoundary)
 	}
+	lowRiskReadiness := lowRiskBoundary["class_promotion_readiness"].(map[string]any)
+	prereqs, ok := lowRiskReadiness["promotion_prerequisites"].(map[string]any)
+	if !ok {
+		t.Fatalf("low_risk_code readiness must expose promotion_prerequisites: %#v", lowRiskReadiness)
+	}
+	for _, key := range []string{
+		"successful_test_only_live_evidence",
+		"rollback_fixture",
+		"sentinel_clear_verdict",
+		"clean_main_ci",
+		"exact_covenant_class_ticket",
+		"command_readback",
+	} {
+		if prereqs[key] != true {
+			t.Fatalf("low_risk_code prerequisite %s must be true: %#v", key, prereqs)
+		}
+	}
+	wrongTicketBoundaryPath := filepath.Join(root, "tmp/checked-in-live-mutation-low-risk-code-wrong-ticket-boundary.json")
+	assertRunOK(t, []string{"live-mutation", "boundary", "--authority", filepath.Join(root, "examples/live-mutation/invalid/covenant-authority.wrong-class-for-low-risk.json"), "--foundry-request", filepath.Join(root, "examples/live-mutation/valid/foundry-request.low-risk-code-ready.json"), "--forge-plan", filepath.Join(root, "examples/live-mutation/valid/forge-plan.low-risk-code-ready.json"), "--ao2-packet", filepath.Join(root, "examples/live-mutation/valid/ao2-packet.low-risk-code-ready.json"), "--sentinel-hold", filepath.Join(root, "examples/live-mutation/valid/sentinel-hold.low-risk-code-clear.json"), "--rollback", filepath.Join(root, "examples/live-mutation/valid/rollback-rehearsal.test-only-ready.json"), "--command-status", filepath.Join(root, "examples/live-mutation/valid/command-status.low-risk-code-ready.json"), "--out", wrongTicketBoundaryPath})
+	wrongTicketBoundary := readMap(t, wrongTicketBoundaryPath)
+	if wrongTicketBoundary["status"] != "failed" ||
+		wrongTicketBoundary["safe_to_promote_next_class"] != false ||
+		!boundaryHasBlocker(wrongTicketBoundary, "class_promotion_covenant_ticket") {
+		t.Fatalf("wrong Covenant class ticket must deny low_risk_code promotion: %#v", wrongTicketBoundary)
+	}
+	checkedLowRiskPrereqs := readMap(t, filepath.Join(root, "examples/live-mutation/valid/live-mutation-boundary.low-risk-code-prereqs.passed.json"))
+	if checkedLowRiskPrereqs["status"] != "passed" ||
+		checkedLowRiskPrereqs["safe_to_promote_next_class"] != true {
+		t.Fatalf("checked low_risk_code prerequisite fixture drifted: %#v", checkedLowRiskPrereqs)
+	}
+	checkedInvalidLowRiskPrereqs := readMap(t, filepath.Join(root, "examples/live-mutation/invalid/live-mutation-boundary.low-risk-code-wrong-ticket.failed.json"))
+	if checkedInvalidLowRiskPrereqs["status"] != "failed" ||
+		!boundaryHasBlocker(checkedInvalidLowRiskPrereqs, "class_promotion_covenant_ticket") {
+		t.Fatalf("checked low_risk_code wrong-ticket fixture drifted: %#v", checkedInvalidLowRiskPrereqs)
+	}
 	assertRunOK(t, []string{"live-mutation", "docs-boundary", "--approval-ticket", filepath.Join(root, "examples/live-docs-mutation/valid/approval-ticket.approved.json"), "--foundry-gate", filepath.Join(root, "examples/live-docs-mutation/valid/foundry-approval-gate.ready.json"), "--forge-guard", filepath.Join(root, "examples/live-docs-mutation/valid/forge-guard.ready.json"), "--ao2-packet", filepath.Join(root, "examples/live-docs-mutation/valid/ao2-docs-packet.ready.json"), "--sentinel-verdict", filepath.Join(root, "examples/live-docs-mutation/valid/sentinel-verdict.clear.json"), "--rollback", filepath.Join(root, "examples/live-docs-mutation/valid/rollback-execution.ready.json"), "--command-readback", filepath.Join(root, "examples/live-docs-mutation/valid/command-readback.ready.json"), "--out", filepath.Join(root, "tmp/checked-in-live-docs-boundary.json")})
 	invalidBoundaryPath := filepath.Join(root, "tmp/checked-in-invalid-live-mutation-boundary.json")
 	assertRunOK(t, []string{"live-mutation", "boundary", "--authority", filepath.Join(root, "examples/live-mutation/valid/covenant-authority.approved.json"), "--foundry-request", filepath.Join(root, "examples/live-mutation/valid/foundry-request.ready.json"), "--forge-plan", filepath.Join(root, "examples/live-mutation/valid/forge-plan.ready.json"), "--ao2-packet", filepath.Join(root, "examples/live-mutation/invalid/ao2-packet.forbidden-authority.json"), "--sentinel-hold", filepath.Join(root, "examples/live-mutation/valid/sentinel-hold.clear.json"), "--rollback", filepath.Join(root, "examples/live-mutation/valid/rollback-rehearsal.ready.json"), "--command-status", filepath.Join(root, "examples/live-mutation/valid/command-status.ready.json"), "--out", invalidBoundaryPath})
