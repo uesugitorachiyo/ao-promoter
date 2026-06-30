@@ -50,7 +50,11 @@ after a completed live rehearsal for the current class, class-bound rollback
 proof, clean `main` CI, and no active Sentinel or Promoter holds. It fails
 closed when any upstream artifact is missing, not ready, on hold, not
 digest-bound, claims scheduling, execution, approval, provider, release, or
-repository mutation authority, or skips a mutation class in the ladder.
+repository mutation authority, or skips the current live rehearsal successor.
+The live rehearsal successor path currently advances from
+`docs_only_single_file` to `docs_only_multi_file` to `test_only`; config-only
+remains a defined class but is not promoted live until a later slice adds
+evidence for that boundary.
 
 Passing this boundary does not perform live mutation and does not grant ungated
 authority. It reports whether the next class can be promoted by policy; fully

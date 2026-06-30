@@ -1,0 +1,17 @@
+{
+  "schema_version": "ao.foundry.live-mutation-request.v0.1",
+  "status": "ready",
+  "mode": "dry_run_only",
+  "requested_scope": "test_only_fixture",
+  "mutation_class": "test_only",
+  "target_repo": "ao-atlas",
+  "branch_isolation_required": true,
+  "rollback_rehearsal_required": true,
+  "mutates_live_state": false,
+  "mutates_repositories": false,
+  "schedules_work": false,
+  "executes_work": false,
+  "approves_work": false,
+  "provider_calls_allowed": false,
+  "release_or_publish_allowed": false
+}

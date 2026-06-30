@@ -40,14 +40,12 @@ var acceptedStatuses = map[string]string{
 
 var allowedKinds = setOf("factory", "orchestrator", "benchmark", "hardening", "policy", "command_surface", "control_plane", "stack_revision")
 var allowedSlots = setOf("factory", "orchestrator", "benchmark", "hardening", "policy", "command_surface", "control_plane", "release_gate")
-var mutationClassLadder = []string{
-	"docs_only_single_file",
-	"docs_only_multi_file",
-	"docs_config_only",
-	"test_only",
-	"low_risk_code",
-	"multi_repo_low_risk",
-	"complex_repo_mutation",
+var mutationClassPromotionSuccessor = map[string]string{
+	"docs_only_single_file": "docs_only_multi_file",
+	"docs_only_multi_file":  "test_only",
+	"test_only":             "low_risk_code",
+	"low_risk_code":         "multi_repo_low_risk",
+	"multi_repo_low_risk":   "complex_repo_mutation",
 }
 
 type blocker struct {
@@ -725,12 +723,7 @@ func evaluateClassPromotionReadiness(evidence map[string]map[string]any) ([]bloc
 }
 
 func nextMutationClass(current string) string {
-	for i, class := range mutationClassLadder {
-		if class == current && i+1 < len(mutationClassLadder) {
-			return mutationClassLadder[i+1]
-		}
-	}
-	return ""
+	return mutationClassPromotionSuccessor[current]
 }
 
 func firstNonEmpty(values ...string) string {
