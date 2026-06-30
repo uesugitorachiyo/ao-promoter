@@ -1,0 +1,25 @@
+{
+  "schema_version": "ao.sentinel.live-mutation-hold.v0.1",
+  "status": "clear",
+  "mutation_class": "low_risk_code",
+  "class_hold_verdict": {
+    "status": "clear",
+    "mutation_class": "low_risk_code",
+    "test_coverage_status": "passed",
+    "file_class_status": "passed",
+    "blockers": []
+  },
+  "hold_required": false,
+  "promoter_hold_required": false,
+  "rollback_recommended": false,
+  "blockers": [],
+  "recommended_actions": [],
+  "operator_mode": "read_only",
+  "mutates_live_state": false,
+  "mutates_repositories": false,
+  "schedules_work": false,
+  "executes_work": false,
+  "approves_work": false,
+  "provider_calls_allowed": false,
+  "release_or_publish_allowed": false
+}
