@@ -492,13 +492,16 @@ func runSafety(args []string, stdout io.Writer) error {
 
 func runLiveMutation(args []string, stdout io.Writer) error {
 	if len(args) == 0 {
-		return errors.New("live-mutation command requires boundary or docs-boundary")
+		return errors.New("live-mutation command requires boundary, docs-boundary, or complex-verdict")
 	}
 	if args[0] == "docs-boundary" {
 		return runLiveDocsMutationBoundary(args[1:], stdout)
 	}
+	if args[0] == "complex-verdict" {
+		return runComplexRepoMutationPromotionVerdict(args[1:], stdout)
+	}
 	if args[0] != "boundary" {
-		return errors.New("live-mutation command requires boundary or docs-boundary")
+		return errors.New("live-mutation command requires boundary, docs-boundary, or complex-verdict")
 	}
 	specs := []liveMutationBoundarySpec{
 		{Role: "covenant_authority", Flag: "--authority", Schema: "covenant.live-mutation-authority.v1", AcceptedStatus: "approved"},
@@ -569,12 +572,111 @@ func runLiveDocsMutationBoundary(args []string, stdout io.Writer) error {
 	return nil
 }
 
+func runComplexRepoMutationPromotionVerdict(args []string, stdout io.Writer) error {
+	rollupPath, err := flagValue(args, "--rollup")
+	if err != nil {
+		return err
+	}
+	out, err := flagValue(args, "--out")
+	if err != nil {
+		return err
+	}
+	if err := requireTmpOutput(out); err != nil {
+		return err
+	}
+	verdict, err := evaluateComplexRepoMutationPromotionVerdict(rollupPath)
+	if err != nil {
+		return err
+	}
+	if err := writeJSON(out, verdict); err != nil {
+		return err
+	}
+	fmt.Fprintf(stdout, "complex-repo mutation promotion verdict: %s\n", verdict["status"])
+	return nil
+}
+
 type liveMutationBoundarySpec struct {
 	Role           string
 	Flag           string
 	Path           string
 	Schema         string
 	AcceptedStatus string
+}
+
+func evaluateComplexRepoMutationPromotionVerdict(rollupPath string) (map[string]any, error) {
+	rollup, err := readJSONMap(rollupPath)
+	if err != nil {
+		return nil, fmt.Errorf("read complex promotion rollup: %w", err)
+	}
+	sha, err := sha256File(rollupPath)
+	if err != nil {
+		return nil, fmt.Errorf("hash complex promotion rollup: %w", err)
+	}
+	blockers := []blocker{}
+	if stringField(rollup, "schema_version") != "ao.foundry.complex-repo-mutation-promotion-rollup.v0.1" {
+		blockers = append(blockers, newBlocker("complex_repo_mutation_promotion_rollup", "critical", "rollup schema mismatch", rollupPath, "attach a Foundry complex_repo_mutation promotion rollup"))
+	}
+	if stringField(rollup, "mutation_class") != "complex_repo_mutation" {
+		blockers = append(blockers, newBlocker("complex_repo_mutation_promotion_rollup", "critical", "rollup mutation_class must be complex_repo_mutation", rollupPath, "evaluate the exact complex_repo_mutation rollup"))
+	}
+	requiredChecks := []string{
+		"all_nodes_completed",
+		"run_links_complete",
+		"node_gates_safe",
+		"no_concurrent_mutation",
+		"pr_ci_merge_evidence",
+		"rollback_evidence",
+		"sentinel_evidence",
+		"promoter_evidence",
+		"command_readback",
+		"atlas_final_workgraph_complete",
+		"bounded_authority",
+		"forbidden_surfaces_clear",
+	}
+	checks, _ := rollup["checks"].(map[string]any)
+	for _, check := range requiredChecks {
+		if !boolField(checks, check) {
+			blockers = append(blockers, newBlocker("complex_repo_mutation_promotion_rollup", "critical", "rollup check "+check+" is not satisfied", rollupPath, "repair missing complex_repo_mutation closure evidence before promotion"))
+		}
+	}
+	if stringField(rollup, "status") != "ready" || !boolField(rollup, "safe_to_promote") || !boolField(rollup, "complex_repo_mutation_live_proven") {
+		reason := firstNonEmpty(stringField(rollup, "first_failing_check"), "rollup is not safe to promote")
+		blockers = append(blockers, newBlocker("complex_repo_mutation_promotion_rollup", "critical", reason, rollupPath, "do not promote complex_repo_mutation until Foundry rollup is ready"))
+	}
+	if stringField(rollup, "fully_unsupervised_complex_mutation") != "denied" || stringField(rollup, "rsi") != "denied" {
+		blockers = append(blockers, newBlocker("complex_repo_mutation_promotion_rollup", "critical", "rollup must keep fully unsupervised complex mutation and RSI denied", rollupPath, "remove unsupported higher-class claims"))
+	}
+	status := "promoted"
+	highest := "complex_repo_mutation"
+	nextDenied := "fully_unsupervised_complex_mutation"
+	if len(blockers) > 0 {
+		status = "denied"
+		highest = firstNonEmpty(stringField(rollup, "highest_proven_live_class"), "multi_repo_low_risk")
+		nextDenied = firstNonEmpty(stringField(rollup, "next_denied_class"), "complex_repo_mutation")
+	}
+	return map[string]any{
+		"schema_version":                      "ao.promoter.complex-repo-mutation-promotion-verdict.v0.1",
+		"status":                              status,
+		"mutation_class":                      "complex_repo_mutation",
+		"safe_to_promote":                     len(blockers) == 0,
+		"complex_repo_mutation_live_proven":   len(blockers) == 0,
+		"highest_proven_live_class":           highest,
+		"next_denied_class":                   nextDenied,
+		"fully_unsupervised_complex_mutation": "denied",
+		"rsi":                                 "denied",
+		"rollup": map[string]any{
+			"path":   filepath.ToSlash(rollupPath),
+			"sha256": sha,
+			"status": stringField(rollup, "status"),
+		},
+		"blockers":             blockers,
+		"required_followups":   followups(blockers),
+		"mutates_repositories": false,
+		"schedules_work":       false,
+		"executes_work":        false,
+		"approves_work":        false,
+		"evaluated_at_utc":     nowUTC(),
+	}, nil
 }
 
 func evaluateLiveMutationBoundary(specs []liveMutationBoundarySpec) (map[string]any, error) {

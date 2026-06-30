@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  go:
+    name: Go
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ao-promoter
+        uses: actions/checkout@v7
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Test
+        run: go test ./... -count=1
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Build
+        run: go build -o bin/promoter ./cmd/promoter
+
+      - name: Public safety scan
+        run: |
+          pattern="ghp""_|github""_pat_|BEGIN ""RSA|BEGIN ""OPENSSH|ANTI""GRAVITY|private ""handoff|api""_key|access""_token"
+          ! rg -n "$pattern" README.md docs examples internal cmd

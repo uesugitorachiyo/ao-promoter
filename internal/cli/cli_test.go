@@ -101,7 +101,7 @@ func TestGateEvaluationActivationRollbackReportApplyAndSafety(t *testing.T) {
 	if activation["dry_run_only"] != true || activation["mutates_live_state"] != false {
 		t.Fatalf("activation plan must be dry-run only: %#v", activation)
 	}
-	assertRunFails(t, []string{"plan", "activate", "--packet", f.packetPath, "--out", filepath.Join(f.root, "activation-plan.json")}, "under tmp")
+	assertRunFails(t, []string{"plan", "activate", "--packet", f.packetPath, "--out", filepath.Join("artifacts", "activation-plan.json")}, "under tmp")
 
 	activeNextPath := filepath.Join(f.tmp, "active-stack.next.json")
 	assertRunOK(t, []string{"active", "render", "--plan", activationPath, "--out", activeNextPath})
@@ -416,6 +416,68 @@ func TestLiveDocsMutationBoundary(t *testing.T) {
 	forbidden := readMap(t, forbiddenOut)
 	if forbidden["status"] != "failed" || forbidden["safe_to_promote_first_docs_only_live_rehearsal"] != false {
 		t.Fatalf("forbidden docs authority should fail boundary: %#v", forbidden)
+	}
+}
+
+func TestComplexRepoPromotionVerdict(t *testing.T) {
+	f := newFixtureSet(t)
+	rollup := map[string]any{
+		"schema_version":                      "ao.foundry.complex-repo-mutation-promotion-rollup.v0.1",
+		"status":                              "ready",
+		"mutation_class":                      "complex_repo_mutation",
+		"safe_to_promote":                     true,
+		"complex_repo_mutation_live_proven":   true,
+		"highest_proven_live_class":           "complex_repo_mutation",
+		"next_denied_class":                   "fully_unsupervised_complex_mutation",
+		"fully_unsupervised_complex_mutation": "denied",
+		"rsi":                                 "denied",
+		"completed_nodes":                     12,
+		"total_nodes":                         12,
+		"checks": map[string]any{
+			"all_nodes_completed":            true,
+			"run_links_complete":             true,
+			"node_gates_safe":                true,
+			"no_concurrent_mutation":         true,
+			"pr_ci_merge_evidence":           true,
+			"rollback_evidence":              true,
+			"sentinel_evidence":              true,
+			"promoter_evidence":              true,
+			"command_readback":               true,
+			"atlas_final_workgraph_complete": true,
+			"bounded_authority":              true,
+			"forbidden_surfaces_clear":       true,
+		},
+		"blockers": []any{},
+	}
+	out := filepath.Join(f.tmp, "complex-promotion-verdict.json")
+	assertRunOK(t, []string{"live-mutation", "complex-verdict", "--rollup", f.writeJSON("complex-rollup.ready.json", rollup), "--out", out})
+	verdict := readMap(t, out)
+	if verdict["schema_version"] != "ao.promoter.complex-repo-mutation-promotion-verdict.v0.1" ||
+		verdict["status"] != "promoted" ||
+		verdict["safe_to_promote"] != true ||
+		verdict["highest_proven_live_class"] != "complex_repo_mutation" ||
+		verdict["next_denied_class"] != "fully_unsupervised_complex_mutation" ||
+		verdict["fully_unsupervised_complex_mutation"] != "denied" ||
+		verdict["rsi"] != "denied" {
+		t.Fatalf("unexpected complex promotion verdict: %#v", verdict)
+	}
+
+	rollup["status"] = "blocked"
+	rollup["safe_to_promote"] = false
+	rollup["complex_repo_mutation_live_proven"] = false
+	rollup["highest_proven_live_class"] = "multi_repo_low_risk"
+	rollup["next_denied_class"] = "complex_repo_mutation"
+	rollup["first_failing_check"] = "run-link complex-docs-intake requires rollback evidence"
+	rollup["blockers"] = []any{"run-link complex-docs-intake requires rollback evidence"}
+	blockedOut := filepath.Join(f.tmp, "complex-promotion-verdict-blocked.json")
+	assertRunOK(t, []string{"live-mutation", "complex-verdict", "--rollup", f.writeJSON("complex-rollup.blocked.json", rollup), "--out", blockedOut})
+	blocked := readMap(t, blockedOut)
+	if blocked["status"] != "denied" ||
+		blocked["safe_to_promote"] != false ||
+		blocked["highest_proven_live_class"] != "multi_repo_low_risk" ||
+		blocked["next_denied_class"] != "complex_repo_mutation" ||
+		!boundaryHasBlocker(blocked, "complex_repo_mutation_promotion_rollup") {
+		t.Fatalf("blocked rollup must produce denied complex promotion verdict: %#v", blocked)
 	}
 }
 
