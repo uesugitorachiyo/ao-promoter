@@ -68,6 +68,10 @@
         "current_class": { "type": "string" },
         "next_class": { "type": "string" },
         "expected_next_class": { "type": "string" },
+        "highest_proven_live_class": { "type": "string" },
+        "current_class_live_evidence_status": { "enum": ["completed", "missing"] },
+        "next_denied_class": { "type": "string" },
+        "next_denied_reason": { "type": "string" },
         "completed_live_rehearsal": { "type": "boolean" },
         "rollback_proof": { "type": "boolean" },
         "clean_main_ci": { "type": "boolean" },
@@ -81,6 +85,7 @@
           "additionalProperties": false,
           "properties": {
             "successful_test_only_live_evidence": { "type": "boolean" },
+            "successful_low_risk_code_live_evidence": { "type": "boolean" },
             "rollback_fixture": { "type": "boolean" },
             "sentinel_clear_verdict": { "type": "boolean" },
             "clean_main_ci": { "type": "boolean" },

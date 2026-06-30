@@ -184,11 +184,54 @@ func TestLiveMutationBoundary(t *testing.T) {
 		t.Fatalf("boundary missing class promotion readiness: %#v", boundary)
 	}
 	if readiness["status"] != "ready" ||
+		readiness["highest_proven_live_class"] != "docs_only_single_file" ||
+		readiness["current_class_live_evidence_status"] != "completed" ||
 		readiness["completed_live_rehearsal"] != true ||
 		readiness["rollback_proof"] != true ||
 		readiness["clean_main_ci"] != true ||
 		readiness["active_holds_clear"] != true {
 		t.Fatalf("unexpected class promotion readiness: %#v", readiness)
+	}
+
+	multiRepoPaths := f.liveMutationEvidencePaths(t, false, false)
+	for _, key := range []string{"authority", "foundry", "forge", "ao2"} {
+		artifact := readMap(t, multiRepoPaths[key])
+		artifact["scope"] = "multi_repo_low_risk_dry_run"
+		artifact["mutation_class"] = "multi_repo_low_risk"
+		artifact["current_mutation_class"] = "low_risk_code"
+		artifact["next_mutation_class"] = "multi_repo_low_risk"
+		artifact["safe_to_request"] = true
+		artifact["safe_to_execute"] = false
+		multiRepoPaths[key] = f.writeJSON("multi-repo-"+key+".json", artifact)
+	}
+	sentinel := readMap(t, multiRepoPaths["sentinel"])
+	sentinel["mutation_class"] = "multi_repo_low_risk"
+	sentinel["class_hold_verdict"] = map[string]any{"status": "clear", "mutation_class": "multi_repo_low_risk", "blockers": []any{}}
+	multiRepoPaths["sentinel"] = f.writeJSON("multi-repo-sentinel.json", sentinel)
+	rollback := readMap(t, multiRepoPaths["rollback"])
+	rollback["mutation_class"] = "low_risk_code"
+	rollback["rollback_verified"] = true
+	multiRepoPaths["rollback"] = f.writeJSON("multi-repo-rollback.json", rollback)
+	command := readMap(t, multiRepoPaths["command"])
+	command["current_mutation_class"] = "low_risk_code"
+	command["next_mutation_class"] = "multi_repo_low_risk"
+	command["completed_live_rehearsal"] = map[string]any{"status": "missing", "mutation_class": "low_risk_code"}
+	command["safe_to_request"] = true
+	command["safe_to_execute"] = false
+	multiRepoPaths["command"] = f.writeJSON("multi-repo-command-missing-low-risk-live.json", command)
+	multiRepoOut := filepath.Join(f.tmp, "multi-repo-missing-low-risk-live.json")
+	assertRunOK(t, liveMutationBoundaryArgs(multiRepoPaths, multiRepoOut))
+	multiRepo := readMap(t, multiRepoOut)
+	if multiRepo["status"] != "failed" || multiRepo["safe_to_promote_next_class"] != false {
+		t.Fatalf("missing low_risk_code live evidence should deny multi_repo_low_risk promotion: %#v", multiRepo)
+	}
+	multiRepoReadiness := multiRepo["class_promotion_readiness"].(map[string]any)
+	if multiRepoReadiness["highest_proven_live_class"] != "test_only" ||
+		multiRepoReadiness["current_class_live_evidence_status"] != "missing" ||
+		multiRepoReadiness["next_denied_class"] != "multi_repo_low_risk" ||
+		multiRepoReadiness["next_denied_reason"] != "denied until low_risk_code completed live rehearsal evidence is recorded" ||
+		!boundaryHasBlocker(multiRepo, "class_promotion_live_rehearsal") {
+		t.Fatalf("multi_repo_low_risk denial readback is incomplete: %#v", multiRepoReadiness)
 	}
 
 	holdPaths := f.liveMutationEvidencePaths(t, true, false)
