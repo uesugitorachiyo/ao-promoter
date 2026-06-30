@@ -40,16 +40,22 @@ git diff --check
 
 ## Governed Live-Mutation Boundary
 
-`promoter live-mutation boundary` is a dry-run activation boundary for the
-future tiny live-mutation class. It requires Covenant authority, Foundry
-request evidence, Forge dry-run plan, AO2 dry-run packet, Sentinel hold verdict,
-rollback rehearsal, and AO Command readback. It fails closed when any upstream
-artifact is missing, not ready, on hold, not digest-bound, or claims scheduling,
-execution, approval, provider, release, or repository mutation authority.
+`promoter live-mutation boundary` is a dry-run activation boundary for governed
+live-mutation class promotion. It requires Covenant authority, Foundry request
+evidence, Forge dry-run plan, AO2 dry-run packet, Sentinel hold verdict,
+rollback rehearsal, and AO Command readback. The output includes
+`current_mutation_class`, `next_mutation_class`, and
+`class_promotion_readiness`. Promotion from one class to the next is ready only
+after a completed live rehearsal for the current class, class-bound rollback
+proof, clean `main` CI, and no active Sentinel or Promoter holds. It fails
+closed when any upstream artifact is missing, not ready, on hold, not
+digest-bound, claims scheduling, execution, approval, provider, release, or
+repository mutation authority, or skips a mutation class in the ladder.
 
 Passing this boundary does not perform live mutation and does not grant ungated
-authority. The first tiny live mutation class still requires explicit operator
-approval and a later governed request.
+authority. It reports whether the next class can be promoted by policy; fully
+unsupervised complex mutation remains unclaimed unless every lower class has
+completed live evidence and all gates are clear.
 
 `promoter live-mutation docs-boundary` is the narrower dry-run promotion
 boundary for the first tiny docs-only live class. It requires an approved

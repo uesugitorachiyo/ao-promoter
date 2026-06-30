@@ -1,6 +1,12 @@
 {
   "schema_version": "ao.sentinel.live-mutation-hold.v0.1",
   "status": "clear",
+  "mutation_class": "docs_only_single_file",
+  "class_hold_verdict": {
+    "status": "clear",
+    "mutation_class": "docs_only_single_file",
+    "blockers": []
+  },
   "hold_required": false,
   "promoter_hold_required": false,
   "rollback_recommended": false,

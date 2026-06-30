@@ -1,6 +1,23 @@
 {
   "schema_version": "ao.promoter.live-mutation-boundary.v0.1",
   "status": "failed",
+  "current_mutation_class": "docs_only_single_file",
+  "next_mutation_class": "docs_only_multi_file",
+  "class_promotion_readiness": {
+    "status": "denied",
+    "current_class": "docs_only_single_file",
+    "next_class": "docs_only_multi_file",
+    "expected_next_class": "docs_only_multi_file",
+    "completed_live_rehearsal": true,
+    "rollback_proof": true,
+    "clean_main_ci": true,
+    "active_holds_clear": false,
+    "denied_reasons": [
+      "clear Sentinel and Promoter holds before class promotion"
+    ],
+    "fully_unsupervised_claimed": false
+  },
+  "safe_to_promote_next_class": false,
   "gate_results": [],
   "blockers": [
     {

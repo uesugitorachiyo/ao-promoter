@@ -3,6 +3,7 @@
   "status": "approved",
   "mode": "dry_run_only",
   "scope": "docs_only_fixture",
+  "mutation_class": "docs_only_single_file",
   "repo": "ao-foundry",
   "allowed_path_class": "docs",
   "rollback_plan_required": true,

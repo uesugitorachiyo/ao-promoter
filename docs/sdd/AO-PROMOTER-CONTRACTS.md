@@ -78,12 +78,17 @@ The canonical v0.1 packet requires:
 - Forge live-mutation dry-run plan with status `ready`;
 - AO2 live-mutation dry-run packet with status `ready`;
 - Sentinel live-mutation hold verdict with status `clear` and no hold;
-- rollback rehearsal with status `ready`;
-- AO Command live-mutation readback with status `ready` and armed kill-switch.
+- rollback rehearsal with status `ready` and class-bound rollback proof;
+- AO Command live-mutation readback with status `ready`, armed kill-switch,
+  current class, next class, completed live rehearsal evidence, clean `main` CI,
+  and no active holds.
 
-The boundary output uses `ao.promoter.live-mutation-boundary.v0.1`. It remains
-dry-run only and must not mutate repositories, schedule work, execute work,
-approve work, call providers, release, or publish.
+The boundary output uses `ao.promoter.live-mutation-boundary.v0.1` and includes
+`current_mutation_class`, `next_mutation_class`,
+`class_promotion_readiness`, and `safe_to_promote_next_class`. Class promotion
+requires the next class to be the immediate governed successor; skipped classes
+are denied. It remains dry-run only and must not mutate repositories, schedule
+work, execute work, approve work, call providers, release, or publish.
 
 ## First Live Docs Boundary Required Evidence
 
@@ -157,6 +162,9 @@ Allowed statuses:
 - `examples/live-mutation/invalid/live-mutation-boundary.failed.json`
 - `examples/live-mutation/invalid/sentinel-hold.required.json`
 - `examples/live-mutation/invalid/ao2-packet.forbidden-authority.json`
+- `examples/live-mutation/invalid/command-status.missing-live-rehearsal.json`
+- `examples/live-mutation/invalid/command-status.main-ci-failed.json`
+- `examples/live-mutation/invalid/rollback-rehearsal.missing-proof.json`
 
 ## Validation Rules
 
@@ -172,3 +180,5 @@ Allowed statuses:
 - Reject live-mutation activation when Sentinel holds, Command kill-switch is
   not armed, rollback evidence is missing, or any input expands mutation,
   scheduling, execution, approval, provider, release, or publication authority.
+- Deny mutation-class promotion when completed live rehearsal evidence,
+  class-bound rollback proof, clean `main` CI, or clear hold evidence is absent.

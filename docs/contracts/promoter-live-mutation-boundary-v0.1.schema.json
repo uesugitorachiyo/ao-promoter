@@ -6,6 +6,10 @@
   "required": [
     "schema_version",
     "status",
+    "current_mutation_class",
+    "next_mutation_class",
+    "class_promotion_readiness",
+    "safe_to_promote_next_class",
     "gate_results",
     "blockers",
     "required_followups",
@@ -24,6 +28,56 @@
   "properties": {
     "schema_version": { "const": "ao.promoter.live-mutation-boundary.v0.1" },
     "status": { "enum": ["passed", "failed"] },
+    "current_mutation_class": {
+      "enum": [
+        "docs_only_single_file",
+        "docs_only_multi_file",
+        "docs_config_only",
+        "test_only",
+        "low_risk_code",
+        "multi_repo_low_risk",
+        "complex_repo_mutation"
+      ]
+    },
+    "next_mutation_class": {
+      "enum": [
+        "docs_only_multi_file",
+        "docs_config_only",
+        "test_only",
+        "low_risk_code",
+        "multi_repo_low_risk",
+        "complex_repo_mutation"
+      ]
+    },
+    "class_promotion_readiness": {
+      "type": "object",
+      "required": [
+        "status",
+        "current_class",
+        "next_class",
+        "expected_next_class",
+        "completed_live_rehearsal",
+        "rollback_proof",
+        "clean_main_ci",
+        "active_holds_clear",
+        "denied_reasons",
+        "fully_unsupervised_claimed"
+      ],
+      "properties": {
+        "status": { "enum": ["ready", "denied"] },
+        "current_class": { "type": "string" },
+        "next_class": { "type": "string" },
+        "expected_next_class": { "type": "string" },
+        "completed_live_rehearsal": { "type": "boolean" },
+        "rollback_proof": { "type": "boolean" },
+        "clean_main_ci": { "type": "boolean" },
+        "active_holds_clear": { "type": "boolean" },
+        "denied_reasons": { "type": "array" },
+        "fully_unsupervised_claimed": { "const": false }
+      },
+      "additionalProperties": true
+    },
+    "safe_to_promote_next_class": { "type": "boolean" },
     "gate_results": { "type": "array" },
     "blockers": { "type": "array" },
     "required_followups": { "type": "array" },
