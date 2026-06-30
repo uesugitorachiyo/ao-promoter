@@ -1,0 +1,21 @@
+{
+  "schema_version": "ao2.live-mutation-dry-run-packet.v1",
+  "status": "ready",
+  "mode": "dry_run_only",
+  "mutation_class": "test_only",
+  "changed_file_plan": [
+    "internal/atlas/atlas_test.go"
+  ],
+  "verification_plan": [
+    "go test ./internal/atlas"
+  ],
+  "rollback_artifact_present": true,
+  "provider_session_boundary": "no_provider_calls",
+  "mutates_live_state": false,
+  "mutates_repositories": false,
+  "schedules_work": false,
+  "executes_work": false,
+  "approves_work": false,
+  "provider_calls_allowed": false,
+  "release_or_publish_allowed": false
+}

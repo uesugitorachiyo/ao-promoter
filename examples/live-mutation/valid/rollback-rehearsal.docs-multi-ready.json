@@ -1,0 +1,17 @@
+{
+  "schema_version": "ao.foundry.live-mutation-rollback-rehearsal.v0.1",
+  "status": "ready",
+  "mode": "dry_run_only",
+  "rollback_candidate": "docs_only_multi_file_fixture",
+  "mutation_class": "docs_only_multi_file",
+  "rollback_verified": true,
+  "revert_path_verified": true,
+  "quarantine_path_verified": true,
+  "mutates_live_state": false,
+  "mutates_repositories": false,
+  "schedules_work": false,
+  "executes_work": false,
+  "approves_work": false,
+  "provider_calls_allowed": false,
+  "release_or_publish_allowed": false
+}
