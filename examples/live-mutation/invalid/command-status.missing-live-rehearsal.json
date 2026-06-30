@@ -5,9 +5,8 @@
   "current_mutation_class": "docs_only_single_file",
   "next_mutation_class": "docs_only_multi_file",
   "completed_live_rehearsal": {
-    "status": "completed",
-    "mutation_class": "docs_only_single_file",
-    "evidence_ref": "pr://docs-only-single-file"
+    "status": "missing",
+    "mutation_class": "docs_only_single_file"
   },
   "clean_main_ci": {
     "status": "passed",

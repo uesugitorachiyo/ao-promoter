@@ -174,6 +174,22 @@ func TestLiveMutationBoundary(t *testing.T) {
 	if len(boundary["gate_results"].([]any)) != 7 {
 		t.Fatalf("boundary should include seven gate results: %#v", boundary["gate_results"])
 	}
+	if boundary["current_mutation_class"] != "docs_only_single_file" ||
+		boundary["next_mutation_class"] != "docs_only_multi_file" ||
+		boundary["safe_to_promote_next_class"] != true {
+		t.Fatalf("boundary should expose ready class promotion: %#v", boundary)
+	}
+	readiness, ok := boundary["class_promotion_readiness"].(map[string]any)
+	if !ok {
+		t.Fatalf("boundary missing class promotion readiness: %#v", boundary)
+	}
+	if readiness["status"] != "ready" ||
+		readiness["completed_live_rehearsal"] != true ||
+		readiness["rollback_proof"] != true ||
+		readiness["clean_main_ci"] != true ||
+		readiness["active_holds_clear"] != true {
+		t.Fatalf("unexpected class promotion readiness: %#v", readiness)
+	}
 
 	holdPaths := f.liveMutationEvidencePaths(t, true, false)
 	holdOut := filepath.Join(f.tmp, "live-mutation-boundary-hold.json")
@@ -182,12 +198,71 @@ func TestLiveMutationBoundary(t *testing.T) {
 	if hold["status"] != "failed" || hold["live_mutation_activation_allowed"] != false {
 		t.Fatalf("Sentinel hold should block boundary: %#v", hold)
 	}
+	if hold["safe_to_promote_next_class"] != false {
+		t.Fatalf("active Sentinel hold must deny class promotion: %#v", hold)
+	}
 
 	forbiddenPaths := f.liveMutationEvidencePaths(t, false, true)
 	assertRunOK(t, liveMutationBoundaryArgs(forbiddenPaths, filepath.Join(f.tmp, "live-mutation-boundary-forbidden.json")))
 	forbidden := readMap(t, filepath.Join(f.tmp, "live-mutation-boundary-forbidden.json"))
 	if forbidden["status"] != "failed" {
 		t.Fatalf("forbidden authority should fail boundary: %#v", forbidden)
+	}
+
+	classBlockers := []struct {
+		name string
+		edit func(map[string]string)
+		want string
+	}{
+		{
+			name: "missing live rehearsal",
+			edit: func(paths map[string]string) {
+				command := readMap(t, paths["command"])
+				command["completed_live_rehearsal"] = map[string]any{"status": "missing", "mutation_class": "docs_only_single_file"}
+				paths["command"] = f.writeJSON("live-command-missing-rehearsal.json", command)
+			},
+			want: "class_promotion_live_rehearsal",
+		},
+		{
+			name: "missing rollback proof",
+			edit: func(paths map[string]string) {
+				rollback := readMap(t, paths["rollback"])
+				rollback["rollback_verified"] = false
+				paths["rollback"] = f.writeJSON("live-rollback-missing-proof.json", rollback)
+			},
+			want: "class_promotion_rollback",
+		},
+		{
+			name: "main ci failed",
+			edit: func(paths map[string]string) {
+				command := readMap(t, paths["command"])
+				command["clean_main_ci"] = map[string]any{"status": "failed", "branch": "main", "observed_at_utc": "2026-06-29T00:00:00Z"}
+				paths["command"] = f.writeJSON("live-command-main-ci-failed.json", command)
+			},
+			want: "class_promotion_main_ci",
+		},
+	}
+	for _, tc := range classBlockers {
+		t.Run(tc.name, func(t *testing.T) {
+			paths := f.liveMutationEvidencePaths(t, false, false)
+			tc.edit(paths)
+			out := filepath.Join(f.tmp, strings.ReplaceAll(tc.name, " ", "-")+".json")
+			assertRunOK(t, liveMutationBoundaryArgs(paths, out))
+			denied := readMap(t, out)
+			if denied["status"] != "failed" || denied["safe_to_promote_next_class"] != false {
+				t.Fatalf("%s should deny class promotion: %#v", tc.name, denied)
+			}
+			blockers := denied["blockers"].([]any)
+			found := false
+			for _, item := range blockers {
+				if b, ok := item.(map[string]any); ok && strings.Contains(b["blocker_id"].(string), tc.want) {
+					found = true
+				}
+			}
+			if !found {
+				t.Fatalf("%s missing blocker %s: %#v", tc.name, tc.want, blockers)
+			}
+		})
 	}
 }
 
@@ -266,6 +341,40 @@ func TestCheckedInExamplesAreCovered(t *testing.T) {
 	assertRunOK(t, []string{"live-mutation", "boundary", "--authority", filepath.Join(root, "examples/live-mutation/valid/covenant-authority.approved.json"), "--foundry-request", filepath.Join(root, "examples/live-mutation/valid/foundry-request.ready.json"), "--forge-plan", filepath.Join(root, "examples/live-mutation/valid/forge-plan.ready.json"), "--ao2-packet", filepath.Join(root, "examples/live-mutation/invalid/ao2-packet.forbidden-authority.json"), "--sentinel-hold", filepath.Join(root, "examples/live-mutation/valid/sentinel-hold.clear.json"), "--rollback", filepath.Join(root, "examples/live-mutation/valid/rollback-rehearsal.ready.json"), "--command-status", filepath.Join(root, "examples/live-mutation/valid/command-status.ready.json"), "--out", invalidBoundaryPath})
 	if invalidBoundary := readMap(t, invalidBoundaryPath); invalidBoundary["status"] != "failed" {
 		t.Fatalf("forbidden live-mutation authority should emit failed boundary: %#v", invalidBoundary)
+	}
+	for _, tc := range []struct {
+		name  string
+		args  []string
+		block string
+	}{
+		{
+			name:  "missing live rehearsal",
+			args:  []string{"live-mutation", "boundary", "--authority", filepath.Join(root, "examples/live-mutation/valid/covenant-authority.approved.json"), "--foundry-request", filepath.Join(root, "examples/live-mutation/valid/foundry-request.ready.json"), "--forge-plan", filepath.Join(root, "examples/live-mutation/valid/forge-plan.ready.json"), "--ao2-packet", filepath.Join(root, "examples/live-mutation/valid/ao2-packet.ready.json"), "--sentinel-hold", filepath.Join(root, "examples/live-mutation/valid/sentinel-hold.clear.json"), "--rollback", filepath.Join(root, "examples/live-mutation/valid/rollback-rehearsal.ready.json"), "--command-status", filepath.Join(root, "examples/live-mutation/invalid/command-status.missing-live-rehearsal.json")},
+			block: "class_promotion_live_rehearsal",
+		},
+		{
+			name:  "main ci failed",
+			args:  []string{"live-mutation", "boundary", "--authority", filepath.Join(root, "examples/live-mutation/valid/covenant-authority.approved.json"), "--foundry-request", filepath.Join(root, "examples/live-mutation/valid/foundry-request.ready.json"), "--forge-plan", filepath.Join(root, "examples/live-mutation/valid/forge-plan.ready.json"), "--ao2-packet", filepath.Join(root, "examples/live-mutation/valid/ao2-packet.ready.json"), "--sentinel-hold", filepath.Join(root, "examples/live-mutation/valid/sentinel-hold.clear.json"), "--rollback", filepath.Join(root, "examples/live-mutation/valid/rollback-rehearsal.ready.json"), "--command-status", filepath.Join(root, "examples/live-mutation/invalid/command-status.main-ci-failed.json")},
+			block: "class_promotion_main_ci",
+		},
+		{
+			name:  "rollback missing proof",
+			args:  []string{"live-mutation", "boundary", "--authority", filepath.Join(root, "examples/live-mutation/valid/covenant-authority.approved.json"), "--foundry-request", filepath.Join(root, "examples/live-mutation/valid/foundry-request.ready.json"), "--forge-plan", filepath.Join(root, "examples/live-mutation/valid/forge-plan.ready.json"), "--ao2-packet", filepath.Join(root, "examples/live-mutation/valid/ao2-packet.ready.json"), "--sentinel-hold", filepath.Join(root, "examples/live-mutation/valid/sentinel-hold.clear.json"), "--rollback", filepath.Join(root, "examples/live-mutation/invalid/rollback-rehearsal.missing-proof.json"), "--command-status", filepath.Join(root, "examples/live-mutation/valid/command-status.ready.json")},
+			block: "class_promotion_rollback",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			out := filepath.Join(root, "tmp", strings.ReplaceAll(tc.name, " ", "-")+".json")
+			args := append(append([]string{}, tc.args...), "--out", out)
+			assertRunOK(t, args)
+			boundary := readMap(t, out)
+			if boundary["status"] != "failed" || boundary["safe_to_promote_next_class"] != false {
+				t.Fatalf("%s should deny class promotion: %#v", tc.name, boundary)
+			}
+			if !boundaryHasBlocker(boundary, tc.block) {
+				t.Fatalf("%s missing blocker %s: %#v", tc.name, tc.block, boundary["blockers"])
+			}
+		})
 	}
 	invalidDocsBoundaryPath := filepath.Join(root, "tmp/checked-in-invalid-live-docs-boundary.json")
 	assertRunOK(t, []string{"live-mutation", "docs-boundary", "--approval-ticket", filepath.Join(root, "examples/live-docs-mutation/valid/approval-ticket.approved.json"), "--foundry-gate", filepath.Join(root, "examples/live-docs-mutation/valid/foundry-approval-gate.ready.json"), "--forge-guard", filepath.Join(root, "examples/live-docs-mutation/valid/forge-guard.ready.json"), "--ao2-packet", filepath.Join(root, "examples/live-docs-mutation/invalid/ao2-docs-packet.forbidden-authority.json"), "--sentinel-verdict", filepath.Join(root, "examples/live-docs-mutation/valid/sentinel-verdict.clear.json"), "--rollback", filepath.Join(root, "examples/live-docs-mutation/valid/rollback-execution.ready.json"), "--command-readback", filepath.Join(root, "examples/live-docs-mutation/valid/command-readback.ready.json"), "--out", invalidDocsBoundaryPath})
@@ -442,6 +551,7 @@ func (f fixtureSet) liveMutationEvidencePaths(t *testing.T, sentinelHold bool, f
 		"status":               "approved",
 		"mode":                 "dry_run_only",
 		"scope":                "docs_only_fixture",
+		"mutation_class":       "docs_only_single_file",
 		"mutates_live_state":   false,
 		"mutates_repositories": false,
 	}
@@ -449,6 +559,7 @@ func (f fixtureSet) liveMutationEvidencePaths(t *testing.T, sentinelHold bool, f
 		"schema_version":       "ao.foundry.live-mutation-request.v0.1",
 		"status":               "ready",
 		"mode":                 "dry_run_only",
+		"mutation_class":       "docs_only_single_file",
 		"mutates_live_state":   false,
 		"mutates_repositories": false,
 	}
@@ -456,6 +567,7 @@ func (f fixtureSet) liveMutationEvidencePaths(t *testing.T, sentinelHold bool, f
 		"schema_version":       "ao.forge.live-mutation-dry-run-plan.v0.1",
 		"status":               "ready",
 		"mode":                 "dry_run_only",
+		"mutation_class":       "docs_only_single_file",
 		"mutates_live_state":   false,
 		"mutates_repositories": false,
 	}
@@ -463,12 +575,15 @@ func (f fixtureSet) liveMutationEvidencePaths(t *testing.T, sentinelHold bool, f
 		"schema_version":       "ao2.live-mutation-dry-run-packet.v1",
 		"status":               "ready",
 		"mode":                 "dry_run_only",
+		"mutation_class":       "docs_only_single_file",
 		"mutates_live_state":   false,
 		"mutates_repositories": false,
 	}
 	sentinel := map[string]any{
 		"schema_version":         "ao.sentinel.live-mutation-hold.v0.1",
 		"status":                 "clear",
+		"mutation_class":         "docs_only_single_file",
+		"class_hold_verdict":     map[string]any{"status": "clear", "mutation_class": "docs_only_single_file", "blockers": []any{}},
 		"hold_required":          false,
 		"promoter_hold_required": false,
 		"mutates_live_state":     false,
@@ -483,12 +598,27 @@ func (f fixtureSet) liveMutationEvidencePaths(t *testing.T, sentinelHold bool, f
 		"schema_version":       "ao.foundry.live-mutation-rollback-rehearsal.v0.1",
 		"status":               "ready",
 		"mode":                 "dry_run_only",
+		"mutation_class":       "docs_only_single_file",
+		"rollback_verified":    true,
 		"mutates_live_state":   false,
 		"mutates_repositories": false,
 	}
 	command := map[string]any{
-		"schema_version":       "ao.command.live-mutation-status.v0.1",
-		"status":               "ready",
+		"schema_version":         "ao.command.live-mutation-status.v0.1",
+		"status":                 "ready",
+		"current_mutation_class": "docs_only_single_file",
+		"next_mutation_class":    "docs_only_multi_file",
+		"completed_live_rehearsal": map[string]any{
+			"status":         "completed",
+			"mutation_class": "docs_only_single_file",
+			"evidence_ref":   "pr://docs-only-single-file",
+		},
+		"clean_main_ci": map[string]any{
+			"status":          "passed",
+			"branch":          "main",
+			"observed_at_utc": "2026-06-29T00:00:00Z",
+		},
+		"active_holds":         []any{},
 		"kill_switch_state":    "armed",
 		"operator_mode":        "read_only",
 		"mutates_live_state":   false,
@@ -688,6 +818,15 @@ func readMap(t *testing.T, path string) map[string]any {
 		t.Fatal(err)
 	}
 	return out
+}
+
+func boundaryHasBlocker(boundary map[string]any, marker string) bool {
+	for _, item := range asAnySlice(boundary["blockers"]) {
+		if blocker, ok := item.(map[string]any); ok && strings.Contains(stringField(blocker, "blocker_id"), marker) {
+			return true
+		}
+	}
+	return false
 }
 
 func TestFutureDatesRemainFresh(t *testing.T) {

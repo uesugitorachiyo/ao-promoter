@@ -10,7 +10,7 @@
     "evidence_ref": "pr://docs-only-single-file"
   },
   "clean_main_ci": {
-    "status": "passed",
+    "status": "failed",
     "branch": "main",
     "observed_at_utc": "2026-06-29T00:00:00Z"
   },

@@ -40,6 +40,15 @@ var acceptedStatuses = map[string]string{
 
 var allowedKinds = setOf("factory", "orchestrator", "benchmark", "hardening", "policy", "command_surface", "control_plane", "stack_revision")
 var allowedSlots = setOf("factory", "orchestrator", "benchmark", "hardening", "policy", "command_surface", "control_plane", "release_gate")
+var mutationClassLadder = []string{
+	"docs_only_single_file",
+	"docs_only_multi_file",
+	"docs_config_only",
+	"test_only",
+	"low_risk_code",
+	"multi_repo_low_risk",
+	"complex_repo_mutation",
+}
 
 type blocker struct {
 	BlockerID         string `json:"blocker_id"`
@@ -573,11 +582,13 @@ type liveMutationBoundarySpec struct {
 func evaluateLiveMutationBoundary(specs []liveMutationBoundarySpec) (map[string]any, error) {
 	blockers := []blocker{}
 	results := []map[string]any{}
+	evidence := map[string]map[string]any{}
 	for _, spec := range specs {
 		raw, err := readJSONMap(spec.Path)
 		if err != nil {
 			return nil, fmt.Errorf("read %s: %w", spec.Role, err)
 		}
+		evidence[spec.Role] = raw
 		sha, err := sha256File(spec.Path)
 		if err != nil {
 			return nil, fmt.Errorf("hash %s: %w", spec.Role, err)
@@ -614,13 +625,20 @@ func evaluateLiveMutationBoundary(specs []liveMutationBoundarySpec) (map[string]
 			"passed":          passed,
 		})
 	}
+	classBlockers, classReadiness := evaluateClassPromotionReadiness(evidence)
+	blockers = append(blockers, classBlockers...)
 	status := "passed"
 	if len(blockers) > 0 {
 		status = "failed"
 	}
+	safeToPromoteNextClass := len(blockers) == 0 && stringField(classReadiness, "status") == "ready"
 	return map[string]any{
 		"schema_version":                    "ao.promoter.live-mutation-boundary.v0.1",
 		"status":                            status,
+		"current_mutation_class":            stringField(classReadiness, "current_class"),
+		"next_mutation_class":               stringField(classReadiness, "next_class"),
+		"class_promotion_readiness":         classReadiness,
+		"safe_to_promote_next_class":        safeToPromoteNextClass,
 		"gate_results":                      results,
 		"blockers":                          blockers,
 		"required_followups":                followups(blockers),
@@ -637,6 +655,91 @@ func evaluateLiveMutationBoundary(specs []liveMutationBoundarySpec) (map[string]
 		"first_tiny_live_class_still_gated": true,
 		"evaluated_at_utc":                  nowUTC(),
 	}, nil
+}
+
+func evaluateClassPromotionReadiness(evidence map[string]map[string]any) ([]blocker, map[string]any) {
+	blockers := []blocker{}
+	command := evidence["command_readback"]
+	sentinel := evidence["sentinel_hold_verdict"]
+	rollback := evidence["rollback_rehearsal"]
+
+	currentClass := firstNonEmpty(stringField(command, "current_mutation_class"), stringField(command, "mutation_class"), stringField(sentinel, "mutation_class"))
+	nextClass := stringField(command, "next_mutation_class")
+	expectedNextClass := nextMutationClass(currentClass)
+
+	if currentClass == "" {
+		blockers = append(blockers, newBlocker("class_promotion_class", "critical", "current mutation class is missing", "", "record current mutation class before class promotion"))
+	}
+	if nextClass == "" {
+		blockers = append(blockers, newBlocker("class_promotion_class", "critical", "next mutation class is missing", "", "record next mutation class before class promotion"))
+	}
+	if currentClass != "" && nextClass != "" && expectedNextClass != nextClass {
+		blockers = append(blockers, newBlocker("class_promotion_class", "critical", "next mutation class is not the immediate governed successor", "", "promote only one mutation class at a time"))
+	}
+
+	rehearsal, _ := command["completed_live_rehearsal"].(map[string]any)
+	completedLiveRehearsal := stringField(rehearsal, "status") == "completed" && stringField(rehearsal, "mutation_class") == currentClass
+	if !completedLiveRehearsal {
+		blockers = append(blockers, newBlocker("class_promotion_live_rehearsal", "critical", "completed live rehearsal evidence is missing", "", "complete and record the current class live rehearsal before promotion"))
+	}
+
+	rollbackClass := stringField(rollback, "mutation_class")
+	rollbackProof := boolField(rollback, "rollback_verified") || (boolField(rollback, "revert_path_verified") && boolField(rollback, "quarantine_path_verified"))
+	if rollbackClass != "" && currentClass != "" && rollbackClass != currentClass {
+		rollbackProof = false
+	}
+	if !rollbackProof {
+		blockers = append(blockers, newBlocker("class_promotion_rollback", "critical", "class-bound rollback proof is missing", "", "prove rollback for the current class before promotion"))
+	}
+
+	mainCI, _ := command["clean_main_ci"].(map[string]any)
+	cleanMainCI := (stringField(mainCI, "status") == "passed" || stringField(mainCI, "status") == "success") && stringField(mainCI, "branch") == "main"
+	if !cleanMainCI {
+		blockers = append(blockers, newBlocker("class_promotion_main_ci", "critical", "clean main CI evidence is missing or failed", "", "attach clean main CI evidence before class promotion"))
+	}
+
+	activeHoldsClear := !boolField(sentinel, "hold_required") && !boolField(sentinel, "promoter_hold_required") && len(asAnySlice(command["active_holds"])) == 0
+	if classVerdict, ok := sentinel["class_hold_verdict"].(map[string]any); ok && stringField(classVerdict, "status") != "clear" {
+		activeHoldsClear = false
+	}
+	if !activeHoldsClear {
+		blockers = append(blockers, newBlocker("class_promotion_active_holds", "critical", "active hold evidence is not clear", "", "clear Sentinel and Promoter holds before class promotion"))
+	}
+
+	status := "ready"
+	if len(blockers) > 0 {
+		status = "denied"
+	}
+	return blockers, map[string]any{
+		"status":                     status,
+		"current_class":              currentClass,
+		"next_class":                 nextClass,
+		"expected_next_class":        expectedNextClass,
+		"completed_live_rehearsal":   completedLiveRehearsal,
+		"rollback_proof":             rollbackProof,
+		"clean_main_ci":              cleanMainCI,
+		"active_holds_clear":         activeHoldsClear,
+		"denied_reasons":             followups(blockers),
+		"fully_unsupervised_claimed": false,
+	}
+}
+
+func nextMutationClass(current string) string {
+	for i, class := range mutationClassLadder {
+		if class == current && i+1 < len(mutationClassLadder) {
+			return mutationClassLadder[i+1]
+		}
+	}
+	return ""
+}
+
+func firstNonEmpty(values ...string) string {
+	for _, value := range values {
+		if strings.TrimSpace(value) != "" {
+			return value
+		}
+	}
+	return ""
 }
 
 func evaluateLiveDocsMutationBoundary(specs []liveMutationBoundarySpec) (map[string]any, error) {

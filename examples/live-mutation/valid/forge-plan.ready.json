@@ -3,6 +3,7 @@
   "status": "ready",
   "mode": "dry_run_only",
   "job_class": "docs_only_fixture",
+  "mutation_class": "docs_only_single_file",
   "requires_covenant_authority": true,
   "requires_isolated_branch": true,
   "requires_pr_lifecycle": true,

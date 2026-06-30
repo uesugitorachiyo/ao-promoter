@@ -1,6 +1,21 @@
 {
   "schema_version": "ao.promoter.live-mutation-boundary.v0.1",
   "status": "passed",
+  "current_mutation_class": "docs_only_single_file",
+  "next_mutation_class": "docs_only_multi_file",
+  "class_promotion_readiness": {
+    "status": "ready",
+    "current_class": "docs_only_single_file",
+    "next_class": "docs_only_multi_file",
+    "expected_next_class": "docs_only_multi_file",
+    "completed_live_rehearsal": true,
+    "rollback_proof": true,
+    "clean_main_ci": true,
+    "active_holds_clear": true,
+    "denied_reasons": [],
+    "fully_unsupervised_claimed": false
+  },
+  "safe_to_promote_next_class": true,
   "gate_results": [],
   "blockers": [],
   "required_followups": [],

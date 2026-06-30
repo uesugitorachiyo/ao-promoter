@@ -1,6 +1,19 @@
 {
   "schema_version": "ao.sentinel.live-mutation-hold.v0.1",
   "status": "hold",
+  "mutation_class": "docs_only_single_file",
+  "class_hold_verdict": {
+    "status": "hold",
+    "mutation_class": "docs_only_single_file",
+    "blockers": [
+      {
+        "blocker_id": "rollback_rehearsal_missing",
+        "severity": "critical",
+        "reason": "required live-mutation evidence is missing",
+        "recommended_action": "provide digest-bound rollback evidence"
+      }
+    ]
+  },
   "hold_required": true,
   "promoter_hold_required": true,
   "rollback_recommended": true,
