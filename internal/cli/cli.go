@@ -769,6 +769,8 @@ func evaluateClassPromotionReadiness(evidence map[string]map[string]any) ([]bloc
 		sentinelClearVerdict := stringField(sentinel, "status") == "clear" && activeHoldsClear
 		successfulLowRiskCodeLiveEvidence := completedLiveRehearsal && currentClass == "low_risk_code"
 		rollbackFixture := rollbackProof && stringField(rollback, "mutation_class") == "low_risk_code"
+		multiRepoPrereqs, multiRepoBlockers := evaluateMultiRepoPromotionPrerequisites(command)
+		blockers = append(blockers, multiRepoBlockers...)
 		prerequisites = map[string]any{
 			"successful_low_risk_code_live_evidence": successfulLowRiskCodeLiveEvidence,
 			"rollback_fixture":                       rollbackFixture,
@@ -776,6 +778,11 @@ func evaluateClassPromotionReadiness(evidence map[string]map[string]any) ([]bloc
 			"clean_main_ci":                          cleanMainCI,
 			"exact_covenant_class_ticket":            exactCovenantClassTicket,
 			"command_readback":                       commandReadback,
+			"ordered_merge_plan":                     multiRepoPrereqs["ordered_merge_plan"],
+			"per_repo_rollback":                      multiRepoPrereqs["per_repo_rollback"],
+			"ci_per_repo":                            multiRepoPrereqs["ci_per_repo"],
+			"fresh_repo_state":                       multiRepoPrereqs["fresh_repo_state"],
+			"kill_switch":                            multiRepoPrereqs["kill_switch"],
 		}
 		requirements = []string{
 			"completed_live_rehearsal:low_risk_code",
@@ -784,6 +791,11 @@ func evaluateClassPromotionReadiness(evidence map[string]map[string]any) ([]bloc
 			"clean_main_ci:main",
 			"exact_covenant_class_ticket:multi_repo_low_risk",
 			"command_readback:multi_repo_low_risk",
+			"ordered_merge_plan:multi_repo_low_risk",
+			"per_repo_rollback:multi_repo_low_risk",
+			"ci_per_repo:multi_repo_low_risk",
+			"fresh_repo_state:multi_repo_low_risk",
+			"kill_switch:armed",
 		}
 		if !exactCovenantClassTicket {
 			blockers = append(blockers, newBlocker("class_promotion_covenant_ticket", "critical", "exact multi_repo_low_risk Covenant class ticket is missing", "", "attach an approved, exact-scope multi_repo_low_risk Covenant ticket before promotion"))
@@ -820,6 +832,93 @@ func evaluateClassPromotionReadiness(evidence map[string]map[string]any) ([]bloc
 		readiness["next_denied_reason"] = classPromotionDenialReason(currentClass, blockers)
 	}
 	return blockers, readiness
+}
+
+func evaluateMultiRepoPromotionPrerequisites(command map[string]any) (map[string]bool, []blocker) {
+	prereqs := map[string]bool{
+		"ordered_merge_plan": false,
+		"per_repo_rollback":  false,
+		"ci_per_repo":        false,
+		"fresh_repo_state":   false,
+		"kill_switch":        stringField(command, "kill_switch_state") == "armed",
+	}
+	blockers := []blocker{}
+	if !prereqs["kill_switch"] {
+		blockers = append(blockers, newBlocker("class_promotion_kill_switch", "critical", "operator kill-switch is not armed", "", "arm the operator kill-switch before multi-repo promotion"))
+	}
+	plan := asAnySlice(command["repo_execution_plan"])
+	if len(plan) < 2 {
+		blockers = append(blockers, newBlocker("class_promotion_ordered_merge_plan", "critical", "ordered multi-repo merge plan is missing", "", "attach serialized per-repo merge dependency evidence"))
+		return prereqs, blockers
+	}
+	seen := map[string]bool{}
+	repos := []string{}
+	orderedOK := true
+	freshStateOK := true
+	rollbackOK := true
+	ciOK := true
+	for index, item := range plan {
+		state, ok := item.(map[string]any)
+		if !ok {
+			orderedOK = false
+			continue
+		}
+		repo := stringField(state, "repo")
+		dependencies := stringsFrom(state["depends_on"])
+		mergeAfter := stringsFrom(state["merge_after"])
+		if repo == "" ||
+			int(numberField(state, "order")) != index+1 ||
+			stringField(state, "planned_pr") == "" ||
+			stringField(state, "status") != "ready" ||
+			!equalStringSlices(dependencies, mergeAfter) {
+			orderedOK = false
+		}
+		for _, dependency := range dependencies {
+			if !seen[dependency] {
+				orderedOK = false
+			}
+		}
+		if stringField(state, "repo_state_status") != "clean_synced" || staleTimestamp(stringField(state, "repo_state_expires_at_utc")) {
+			freshStateOK = false
+		}
+		if stringField(state, "rollback_status") != "ready" {
+			rollbackOK = false
+		}
+		if !statusPassed(stringField(state, "ci_status")) {
+			ciOK = false
+		}
+		seen[repo] = true
+		repos = append(repos, repo)
+	}
+	rollbackByRepo := mapByRepo(command["per_repo_rollback"])
+	ciByRepo := mapByRepo(command["per_repo_ci"])
+	for _, repo := range repos {
+		rollback := rollbackByRepo[repo]
+		if rollback == nil || stringField(rollback, "status") != "ready" || len(asAnySlice(rollback["rollback_scope"])) == 0 {
+			rollbackOK = false
+		}
+		ci := ciByRepo[repo]
+		if ci == nil || !boolField(ci, "required") || !statusPassed(stringField(ci, "status")) {
+			ciOK = false
+		}
+	}
+	prereqs["ordered_merge_plan"] = orderedOK
+	prereqs["per_repo_rollback"] = rollbackOK
+	prereqs["ci_per_repo"] = ciOK
+	prereqs["fresh_repo_state"] = freshStateOK
+	if !orderedOK {
+		blockers = append(blockers, newBlocker("class_promotion_ordered_merge_plan", "critical", "ordered multi-repo merge plan is missing or unsafe", "", "repair serialized per-repo merge dependency evidence"))
+	}
+	if !rollbackOK {
+		blockers = append(blockers, newBlocker("class_promotion_per_repo_rollback", "critical", "per-repo rollback evidence is incomplete", "", "provide ready rollback for every planned repo"))
+	}
+	if !ciOK {
+		blockers = append(blockers, newBlocker("class_promotion_per_repo_ci", "high", "per-repo CI evidence is incomplete", "", "provide passing CI for every planned repo"))
+	}
+	if !freshStateOK {
+		blockers = append(blockers, newBlocker("class_promotion_repo_state", "high", "repo state evidence is stale", "", "refresh clean synced repo-state readback for every repo"))
+	}
+	return prereqs, blockers
 }
 
 func nextMutationClass(current string) string {
@@ -1458,6 +1557,45 @@ func stringsFrom(value any) []string {
 		}
 	}
 	return out
+}
+
+func mapByRepo(value any) map[string]map[string]any {
+	byRepo := map[string]map[string]any{}
+	for _, item := range asAnySlice(value) {
+		entry, ok := item.(map[string]any)
+		if !ok {
+			continue
+		}
+		repo := stringField(entry, "repo")
+		if repo != "" {
+			byRepo[repo] = entry
+		}
+	}
+	return byRepo
+}
+
+func equalStringSlices(left, right []string) bool {
+	if len(left) != len(right) {
+		return false
+	}
+	for index := range left {
+		if left[index] != right[index] {
+			return false
+		}
+	}
+	return true
+}
+
+func staleTimestamp(value string) bool {
+	expiresAt, err := time.Parse(time.RFC3339, value)
+	if err != nil {
+		return true
+	}
+	return !expiresAt.After(time.Now().UTC())
+}
+
+func statusPassed(value string) bool {
+	return value == "passed" || value == "success"
 }
 
 func asAnySlice(value any) []any {
