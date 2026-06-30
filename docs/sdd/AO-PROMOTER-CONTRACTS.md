@@ -96,6 +96,12 @@ live evidence, a `test_only` rollback fixture, Sentinel clear verdict for
 `low_risk_code`, clean `main` CI, an exact `low_risk_code` Covenant class
 ticket, and read-only AO Command status. A wrong-class Covenant ticket denies
 promotion even when all other dry-run evidence is ready.
+For the `low_risk_code` to `multi_repo_low_risk` successor, the same readiness
+object reports `highest_proven_live_class`,
+`current_class_live_evidence_status`, `next_denied_class`, and
+`next_denied_reason`. Without a completed `low_risk_code` live rehearsal,
+Promoter keeps the highest proven live class at `test_only` and denies
+`multi_repo_low_risk` promotion even if dry-run artifacts are otherwise ready.
 
 ## First Live Docs Boundary Required Evidence
 

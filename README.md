@@ -61,6 +61,12 @@ rollback fixture, low-risk Sentinel clear verdict, clean `main` CI, exact
 `low_risk_code` Covenant class ticket, and read-only Command readback. A
 wrong-class Covenant ticket fails the boundary even when the rest of the dry-run
 evidence is ready.
+For the `low_risk_code` to `multi_repo_low_risk` boundary, Promoter reports
+`highest_proven_live_class`, `current_class_live_evidence_status`,
+`next_denied_class`, and `next_denied_reason`. If `low_risk_code` has only
+dry-run/readback evidence, the highest proven live class remains `test_only`
+and `multi_repo_low_risk` is denied until completed low-risk live rehearsal
+evidence is recorded.
 
 Passing this boundary does not perform live mutation and does not grant ungated
 authority. It reports whether the next class can be promoted by policy; fully

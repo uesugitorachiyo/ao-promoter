@@ -678,6 +678,14 @@ func evaluateClassPromotionReadiness(evidence map[string]map[string]any) ([]bloc
 
 	rehearsal, _ := command["completed_live_rehearsal"].(map[string]any)
 	completedLiveRehearsal := stringField(rehearsal, "status") == "completed" && stringField(rehearsal, "mutation_class") == currentClass
+	currentClassLiveEvidenceStatus := "missing"
+	if completedLiveRehearsal {
+		currentClassLiveEvidenceStatus = "completed"
+	}
+	highestProvenLiveClass := previousMutationClass(currentClass)
+	if completedLiveRehearsal {
+		highestProvenLiveClass = currentClass
+	}
 	if !completedLiveRehearsal {
 		blockers = append(blockers, newBlocker("class_promotion_live_rehearsal", "critical", "completed live rehearsal evidence is missing", "", "complete and record the current class live rehearsal before promotion"))
 	}
@@ -745,32 +753,98 @@ func evaluateClassPromotionReadiness(evidence map[string]map[string]any) ([]bloc
 			blockers = append(blockers, newBlocker("class_promotion_command_readback", "critical", "low_risk_code Command readback is missing or unsafe", "", "attach read-only Command readback with armed kill-switch before promotion"))
 		}
 	}
+	if currentClass == "low_risk_code" && nextClass == "multi_repo_low_risk" {
+		exactCovenantClassTicket := stringField(authority, "schema_version") == "covenant.live-mutation-authority.v1" &&
+			stringField(authority, "status") == "approved" &&
+			stringField(authority, "mutation_class") == "multi_repo_low_risk" &&
+			boolField(authority, "safe_to_request") &&
+			!boolField(authority, "safe_to_execute")
+		commandReadback := stringField(command, "schema_version") == "ao.command.live-mutation-status.v0.1" &&
+			stringField(command, "status") == "ready" &&
+			stringField(command, "operator_mode") == "read_only" &&
+			stringField(command, "kill_switch_state") == "armed" &&
+			stringField(command, "current_mutation_class") == "low_risk_code" &&
+			stringField(command, "next_mutation_class") == "multi_repo_low_risk" &&
+			!boolField(command, "safe_to_execute")
+		sentinelClearVerdict := stringField(sentinel, "status") == "clear" && activeHoldsClear
+		successfulLowRiskCodeLiveEvidence := completedLiveRehearsal && currentClass == "low_risk_code"
+		rollbackFixture := rollbackProof && stringField(rollback, "mutation_class") == "low_risk_code"
+		prerequisites = map[string]any{
+			"successful_low_risk_code_live_evidence": successfulLowRiskCodeLiveEvidence,
+			"rollback_fixture":                       rollbackFixture,
+			"sentinel_clear_verdict":                 sentinelClearVerdict,
+			"clean_main_ci":                          cleanMainCI,
+			"exact_covenant_class_ticket":            exactCovenantClassTicket,
+			"command_readback":                       commandReadback,
+		}
+		requirements = []string{
+			"completed_live_rehearsal:low_risk_code",
+			"rollback_fixture:low_risk_code",
+			"sentinel_clear_verdict:multi_repo_low_risk",
+			"clean_main_ci:main",
+			"exact_covenant_class_ticket:multi_repo_low_risk",
+			"command_readback:multi_repo_low_risk",
+		}
+		if !exactCovenantClassTicket {
+			blockers = append(blockers, newBlocker("class_promotion_covenant_ticket", "critical", "exact multi_repo_low_risk Covenant class ticket is missing", "", "attach an approved, exact-scope multi_repo_low_risk Covenant ticket before promotion"))
+		}
+		if !commandReadback {
+			blockers = append(blockers, newBlocker("class_promotion_command_readback", "critical", "multi_repo_low_risk Command readback is missing or unsafe", "", "attach read-only Command readback with armed kill-switch before promotion"))
+		}
+	}
 
 	status := "ready"
 	if len(blockers) > 0 {
 		status = "denied"
 	}
 	readiness := map[string]any{
-		"status":                     status,
-		"current_class":              currentClass,
-		"next_class":                 nextClass,
-		"expected_next_class":        expectedNextClass,
-		"completed_live_rehearsal":   completedLiveRehearsal,
-		"rollback_proof":             rollbackProof,
-		"clean_main_ci":              cleanMainCI,
-		"active_holds_clear":         activeHoldsClear,
-		"denied_reasons":             followups(blockers),
-		"fully_unsupervised_claimed": false,
+		"status":                             status,
+		"current_class":                      currentClass,
+		"next_class":                         nextClass,
+		"expected_next_class":                expectedNextClass,
+		"highest_proven_live_class":          highestProvenLiveClass,
+		"current_class_live_evidence_status": currentClassLiveEvidenceStatus,
+		"completed_live_rehearsal":           completedLiveRehearsal,
+		"rollback_proof":                     rollbackProof,
+		"clean_main_ci":                      cleanMainCI,
+		"active_holds_clear":                 activeHoldsClear,
+		"denied_reasons":                     followups(blockers),
+		"fully_unsupervised_claimed":         false,
 	}
 	if prerequisites != nil {
 		readiness["promotion_prerequisites"] = prerequisites
 		readiness["promotion_prerequisite_requirements"] = requirements
+	}
+	if status == "denied" && nextClass != "" {
+		readiness["next_denied_class"] = nextClass
+		readiness["next_denied_reason"] = classPromotionDenialReason(currentClass, blockers)
 	}
 	return blockers, readiness
 }
 
 func nextMutationClass(current string) string {
 	return mutationClassPromotionSuccessor[current]
+}
+
+func previousMutationClass(class string) string {
+	for previous, next := range mutationClassPromotionSuccessor {
+		if next == class {
+			return previous
+		}
+	}
+	return ""
+}
+
+func classPromotionDenialReason(currentClass string, blockers []blocker) string {
+	for _, blocker := range blockers {
+		if strings.HasPrefix(blocker.BlockerID, "class_promotion_live_rehearsal") && currentClass != "" {
+			return fmt.Sprintf("denied until %s completed live rehearsal evidence is recorded", currentClass)
+		}
+	}
+	if len(blockers) > 0 {
+		return blockers[0].Reason
+	}
+	return ""
 }
 
 func firstNonEmpty(values ...string) string {
