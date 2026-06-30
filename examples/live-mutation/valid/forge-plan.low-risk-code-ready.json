@@ -1,0 +1,15 @@
+{
+  "schema_version": "ao.forge.live-mutation-dry-run-plan.v0.1",
+  "status": "ready",
+  "mode": "dry_run_only",
+  "mutation_class": "low_risk_code",
+  "safe_to_request": true,
+  "safe_to_execute": false,
+  "mutates_live_state": false,
+  "mutates_repositories": false,
+  "schedules_work": false,
+  "executes_work": false,
+  "approves_work": false,
+  "provider_calls_allowed": false,
+  "release_or_publish_allowed": false
+}

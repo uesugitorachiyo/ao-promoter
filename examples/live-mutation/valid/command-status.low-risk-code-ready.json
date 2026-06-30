@@ -1,0 +1,30 @@
+{
+  "schema_version": "ao.command.live-mutation-status.v0.1",
+  "status": "ready",
+  "allowed_next_action": "request_low_risk_code_dry_run",
+  "current_mutation_class": "test_only",
+  "next_mutation_class": "low_risk_code",
+  "completed_live_rehearsal": {
+    "status": "completed",
+    "mutation_class": "test_only",
+    "evidence_ref": "pr://ao-atlas/28"
+  },
+  "clean_main_ci": {
+    "status": "passed",
+    "branch": "main",
+    "observed_at_utc": "2026-06-30T00:00:00Z"
+  },
+  "active_holds": [],
+  "kill_switch_state": "armed",
+  "operator_mode": "read_only",
+  "safe_to_request": true,
+  "safe_to_execute": false,
+  "mutates_live_state": false,
+  "mutates_repositories": false,
+  "schedules_work": false,
+  "executes_work": false,
+  "approves_work": false,
+  "calls_providers": false,
+  "provider_calls_allowed": false,
+  "release_or_publish_allowed": false
+}
