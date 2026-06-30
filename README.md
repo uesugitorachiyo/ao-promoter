@@ -55,6 +55,12 @@ The live rehearsal successor path currently advances from
 `docs_only_single_file` to `docs_only_multi_file` to `test_only`; config-only
 remains a defined class but is not promoted live until a later slice adds
 evidence for that boundary.
+For the `test_only` to `low_risk_code` boundary, Promoter also emits explicit
+`promotion_prerequisites`: successful `test_only` live evidence, a `test_only`
+rollback fixture, low-risk Sentinel clear verdict, clean `main` CI, exact
+`low_risk_code` Covenant class ticket, and read-only Command readback. A
+wrong-class Covenant ticket fails the boundary even when the rest of the dry-run
+evidence is ready.
 
 Passing this boundary does not perform live mutation and does not grant ungated
 authority. It reports whether the next class can be promoted by policy; fully

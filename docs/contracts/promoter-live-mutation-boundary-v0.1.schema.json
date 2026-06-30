@@ -72,6 +72,22 @@
         "rollback_proof": { "type": "boolean" },
         "clean_main_ci": { "type": "boolean" },
         "active_holds_clear": { "type": "boolean" },
+        "promotion_prerequisite_requirements": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "promotion_prerequisites": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "successful_test_only_live_evidence": { "type": "boolean" },
+            "rollback_fixture": { "type": "boolean" },
+            "sentinel_clear_verdict": { "type": "boolean" },
+            "clean_main_ci": { "type": "boolean" },
+            "exact_covenant_class_ticket": { "type": "boolean" },
+            "command_readback": { "type": "boolean" }
+          }
+        },
         "denied_reasons": { "type": "array" },
         "fully_unsupervised_claimed": { "const": false }
       },

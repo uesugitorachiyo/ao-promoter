@@ -1,0 +1,127 @@
+{
+  "approves_work": false,
+  "blockers": [
+    {
+      "blocker_id": "class_promotion_covenant_ticket_exact_low_risk_code_covenant_class_ticket_is_missing",
+      "gate_role": "class_promotion_covenant_ticket",
+      "severity": "critical",
+      "reason": "exact low_risk_code Covenant class ticket is missing",
+      "evidence_path": "",
+      "recommended_action": "attach an approved, exact-scope low_risk_code Covenant ticket before promotion"
+    }
+  ],
+  "class_promotion_readiness": {
+    "active_holds_clear": true,
+    "clean_main_ci": true,
+    "completed_live_rehearsal": true,
+    "current_class": "test_only",
+    "denied_reasons": [
+      "attach an approved, exact-scope low_risk_code Covenant ticket before promotion"
+    ],
+    "expected_next_class": "low_risk_code",
+    "fully_unsupervised_claimed": false,
+    "next_class": "low_risk_code",
+    "promotion_prerequisite_requirements": [
+      "completed_live_rehearsal:test_only",
+      "rollback_fixture:test_only",
+      "sentinel_clear_verdict:low_risk_code",
+      "clean_main_ci:main",
+      "exact_covenant_class_ticket:low_risk_code",
+      "command_readback:low_risk_code"
+    ],
+    "promotion_prerequisites": {
+      "clean_main_ci": true,
+      "command_readback": true,
+      "exact_covenant_class_ticket": false,
+      "rollback_fixture": true,
+      "sentinel_clear_verdict": true,
+      "successful_test_only_live_evidence": true
+    },
+    "rollback_proof": true,
+    "status": "denied"
+  },
+  "current_mutation_class": "test_only",
+  "dry_run_only": true,
+  "evaluated_at_utc": "2026-06-30T00:00:00Z",
+  "executes_work": false,
+  "first_tiny_live_class_still_gated": true,
+  "gate_results": [
+    {
+      "accepted_status": "approved",
+      "passed": true,
+      "path": "examples/live-mutation/invalid/covenant-authority.wrong-class-for-low-risk.json",
+      "role": "covenant_authority",
+      "schema_version": "covenant.live-mutation-authority.v1",
+      "sha256": "c7607d99305d98d28003ee6ba1b54bb0d123475339704fdc391d5a19f97b1573",
+      "status": "approved"
+    },
+    {
+      "accepted_status": "ready",
+      "passed": true,
+      "path": "examples/live-mutation/valid/foundry-request.low-risk-code-ready.json",
+      "role": "foundry_request",
+      "schema_version": "ao.foundry.live-mutation-request.v0.1",
+      "sha256": "7eaca2c0a555498a412c58982ddbaed79d917a5cfce0cf253b822ba8ef5f6033",
+      "status": "ready"
+    },
+    {
+      "accepted_status": "ready",
+      "passed": true,
+      "path": "examples/live-mutation/valid/forge-plan.low-risk-code-ready.json",
+      "role": "forge_dry_run_plan",
+      "schema_version": "ao.forge.live-mutation-dry-run-plan.v0.1",
+      "sha256": "b4a38bd1567183572b723fac96a9c47c130c8c9d0fa12ab06ecb7f67a22c9065",
+      "status": "ready"
+    },
+    {
+      "accepted_status": "ready",
+      "passed": true,
+      "path": "examples/live-mutation/valid/ao2-packet.low-risk-code-ready.json",
+      "role": "ao2_dry_run_packet",
+      "schema_version": "ao2.live-mutation-dry-run-packet.v1",
+      "sha256": "9333e05d14f4fed59943ce9f632ea02378cad6208375e98f60394e553ec6cc85",
+      "status": "ready"
+    },
+    {
+      "accepted_status": "clear",
+      "passed": true,
+      "path": "examples/live-mutation/valid/sentinel-hold.low-risk-code-clear.json",
+      "role": "sentinel_hold_verdict",
+      "schema_version": "ao.sentinel.live-mutation-hold.v0.1",
+      "sha256": "c409a9010e55007d18c6fac7a8e1b03df9507ed00f24bb08424b942c4a05fb49",
+      "status": "clear"
+    },
+    {
+      "accepted_status": "ready",
+      "passed": true,
+      "path": "examples/live-mutation/valid/rollback-rehearsal.test-only-ready.json",
+      "role": "rollback_rehearsal",
+      "schema_version": "ao.foundry.live-mutation-rollback-rehearsal.v0.1",
+      "sha256": "6d40b3d273d8bc73be077f96d797380fae7bf0cff1438c2078aab967d61c6bf7",
+      "status": "ready"
+    },
+    {
+      "accepted_status": "ready",
+      "passed": true,
+      "path": "examples/live-mutation/valid/command-status.low-risk-code-ready.json",
+      "role": "command_readback",
+      "schema_version": "ao.command.live-mutation-status.v0.1",
+      "sha256": "f64674f78a27a401c0ec78238c73e4d8dfcb588a1bdbc2b18c0b807d714c69b9",
+      "status": "ready"
+    }
+  ],
+  "live_mutation_activation_allowed": false,
+  "mutates_live_state": false,
+  "mutates_repositories": false,
+  "next_mutation_class": "low_risk_code",
+  "operator_approval_still_required": true,
+  "provider_calls_allowed": false,
+  "release_or_publish_allowed": false,
+  "required_followups": [
+    "attach an approved, exact-scope low_risk_code Covenant ticket before promotion"
+  ],
+  "safe_to_promote_next_class": false,
+  "schedules_work": false,
+  "schema_version": "ao.promoter.live-mutation-boundary.v0.1",
+  "status": "failed"
+}
