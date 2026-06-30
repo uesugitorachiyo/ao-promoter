@@ -90,7 +90,12 @@
             "sentinel_clear_verdict": { "type": "boolean" },
             "clean_main_ci": { "type": "boolean" },
             "exact_covenant_class_ticket": { "type": "boolean" },
-            "command_readback": { "type": "boolean" }
+            "command_readback": { "type": "boolean" },
+            "ordered_merge_plan": { "type": "boolean" },
+            "per_repo_rollback": { "type": "boolean" },
+            "ci_per_repo": { "type": "boolean" },
+            "fresh_repo_state": { "type": "boolean" },
+            "kill_switch": { "type": "boolean" }
           }
         },
         "denied_reasons": { "type": "array" },

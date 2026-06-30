@@ -234,6 +234,80 @@ func TestLiveMutationBoundary(t *testing.T) {
 		t.Fatalf("multi_repo_low_risk denial readback is incomplete: %#v", multiRepoReadiness)
 	}
 
+	multiRepoReadyPaths := multiRepoPromotionFixture(t, f, nil)
+	multiRepoReadyOut := filepath.Join(f.tmp, "multi-repo-ready.json")
+	assertRunOK(t, liveMutationBoundaryArgs(multiRepoReadyPaths, multiRepoReadyOut))
+	multiRepoReady := readMap(t, multiRepoReadyOut)
+	readyPrereqs := multiRepoReady["class_promotion_readiness"].(map[string]any)["promotion_prerequisites"].(map[string]any)
+	for _, key := range []string{"ordered_merge_plan", "per_repo_rollback", "ci_per_repo", "fresh_repo_state", "kill_switch"} {
+		if readyPrereqs[key] != true {
+			t.Fatalf("multi_repo_low_risk prerequisite %s must be true: %#v", key, readyPrereqs)
+		}
+	}
+
+	for _, tc := range []struct {
+		name string
+		edit func(map[string]any)
+		want string
+	}{
+		{
+			name: "missing dependency",
+			edit: func(command map[string]any) {
+				plan := command["repo_execution_plan"].([]any)
+				foundry := plan[1].(map[string]any)
+				foundry["depends_on"] = []any{"ao-command"}
+				foundry["merge_after"] = []any{"ao-command"}
+			},
+			want: "class_promotion_ordered_merge_plan",
+		},
+		{
+			name: "stale repo state",
+			edit: func(command map[string]any) {
+				plan := command["repo_execution_plan"].([]any)
+				foundry := plan[1].(map[string]any)
+				foundry["repo_state_status"] = "stale"
+				foundry["repo_state_expires_at_utc"] = "2000-01-01T00:00:00Z"
+			},
+			want: "class_promotion_repo_state",
+		},
+		{
+			name: "partial rollback",
+			edit: func(command map[string]any) {
+				rollbacks := command["per_repo_rollback"].([]any)
+				commandRollback := rollbacks[2].(map[string]any)
+				commandRollback["status"] = "missing"
+				commandRollback["rollback_scope"] = []any{}
+			},
+			want: "class_promotion_per_repo_rollback",
+		},
+		{
+			name: "missing per repo ci",
+			edit: func(command map[string]any) {
+				ci := command["per_repo_ci"].([]any)
+				commandCI := ci[2].(map[string]any)
+				commandCI["status"] = "pending"
+			},
+			want: "class_promotion_per_repo_ci",
+		},
+		{
+			name: "kill switch disarmed",
+			edit: func(command map[string]any) {
+				command["kill_switch_state"] = "disarmed"
+			},
+			want: "class_promotion_kill_switch",
+		},
+	} {
+		t.Run("multi_repo_"+strings.ReplaceAll(tc.name, " ", "_"), func(t *testing.T) {
+			paths := multiRepoPromotionFixture(t, f, tc.edit)
+			out := filepath.Join(f.tmp, strings.ReplaceAll(tc.name, " ", "-")+".json")
+			assertRunOK(t, liveMutationBoundaryArgs(paths, out))
+			denied := readMap(t, out)
+			if denied["status"] != "failed" || !boundaryHasBlocker(denied, tc.want) {
+				t.Fatalf("%s should deny multi_repo_low_risk promotion with %s: %#v", tc.name, tc.want, denied)
+			}
+		})
+	}
+
 	holdPaths := f.liveMutationEvidencePaths(t, true, false)
 	holdOut := filepath.Join(f.tmp, "live-mutation-boundary-hold.json")
 	assertRunOK(t, liveMutationBoundaryArgs(holdPaths, holdOut))
@@ -734,6 +808,67 @@ func (f fixtureSet) liveMutationEvidencePaths(t *testing.T, sentinelHold bool, f
 		"rollback":  f.writeJSON("live-rollback.json", rollback),
 		"command":   f.writeJSON("live-command.json", command),
 	}
+}
+
+func multiRepoPromotionFixture(t *testing.T, f fixtureSet, editCommand func(map[string]any)) map[string]string {
+	t.Helper()
+	paths := f.liveMutationEvidencePaths(t, false, false)
+	for _, key := range []string{"authority", "foundry", "forge", "ao2"} {
+		artifact := readMap(t, paths[key])
+		artifact["scope"] = "multi_repo_low_risk_dry_run"
+		artifact["mutation_class"] = "multi_repo_low_risk"
+		artifact["current_mutation_class"] = "low_risk_code"
+		artifact["next_mutation_class"] = "multi_repo_low_risk"
+		artifact["safe_to_request"] = true
+		artifact["safe_to_execute"] = false
+		paths[key] = f.writeJSON("multi-repo-ready-"+key+".json", artifact)
+	}
+	sentinel := readMap(t, paths["sentinel"])
+	sentinel["mutation_class"] = "multi_repo_low_risk"
+	sentinel["class_hold_verdict"] = map[string]any{
+		"status":                       "clear",
+		"mutation_class":               "multi_repo_low_risk",
+		"multi_repo_dependency_status": "passed",
+		"per_repo_rollback_status":     "ready",
+		"per_repo_ci_status":           "passed",
+		"repo_state_status":            "fresh",
+		"blockers":                     []any{},
+	}
+	paths["sentinel"] = f.writeJSON("multi-repo-ready-sentinel.json", sentinel)
+	rollback := readMap(t, paths["rollback"])
+	rollback["mutation_class"] = "low_risk_code"
+	rollback["rollback_verified"] = true
+	paths["rollback"] = f.writeJSON("multi-repo-ready-rollback.json", rollback)
+	command := readMap(t, paths["command"])
+	command["current_mutation_class"] = "low_risk_code"
+	command["next_mutation_class"] = "multi_repo_low_risk"
+	command["completed_live_rehearsal"] = map[string]any{
+		"status":         "completed",
+		"mutation_class": "low_risk_code",
+		"evidence_ref":   "pr://ao-atlas/low-risk-code",
+	}
+	command["safe_to_request"] = true
+	command["safe_to_execute"] = false
+	command["repo_execution_plan"] = []any{
+		map[string]any{"repo": "ao-atlas", "order": 1, "planned_pr": "dry-run-pr:ao-atlas", "status": "ready", "depends_on": []any{}, "merge_after": []any{}, "rollback_status": "ready", "ci_status": "passed", "repo_state_status": "clean_synced", "repo_state_expires_at_utc": "2999-01-01T00:00:00Z"},
+		map[string]any{"repo": "ao-foundry", "order": 2, "planned_pr": "dry-run-pr:ao-foundry", "status": "ready", "depends_on": []any{"ao-atlas"}, "merge_after": []any{"ao-atlas"}, "rollback_status": "ready", "ci_status": "passed", "repo_state_status": "clean_synced", "repo_state_expires_at_utc": "2999-01-01T00:00:00Z"},
+		map[string]any{"repo": "ao-command", "order": 3, "planned_pr": "dry-run-pr:ao-command", "status": "ready", "depends_on": []any{"ao-foundry"}, "merge_after": []any{"ao-foundry"}, "rollback_status": "ready", "ci_status": "passed", "repo_state_status": "clean_synced", "repo_state_expires_at_utc": "2999-01-01T00:00:00Z"},
+	}
+	command["per_repo_rollback"] = []any{
+		map[string]any{"repo": "ao-atlas", "status": "ready", "rollback_scope": []any{"repo:ao-atlas:internal/**"}},
+		map[string]any{"repo": "ao-foundry", "status": "ready", "rollback_scope": []any{"repo:ao-foundry:internal/**"}},
+		map[string]any{"repo": "ao-command", "status": "ready", "rollback_scope": []any{"repo:ao-command:internal/**"}},
+	}
+	command["per_repo_ci"] = []any{
+		map[string]any{"repo": "ao-atlas", "status": "passed", "required": true},
+		map[string]any{"repo": "ao-foundry", "status": "passed", "required": true},
+		map[string]any{"repo": "ao-command", "status": "passed", "required": true},
+	}
+	if editCommand != nil {
+		editCommand(command)
+	}
+	paths["command"] = f.writeJSON("multi-repo-ready-command.json", command)
+	return paths
 }
 
 func (f fixtureSet) liveDocsMutationEvidencePaths(t *testing.T, sentinelHold bool, forbiddenAuthority bool) map[string]string {
