@@ -101,7 +101,7 @@ func TestGateEvaluationActivationRollbackReportApplyAndSafety(t *testing.T) {
 	if activation["dry_run_only"] != true || activation["mutates_live_state"] != false {
 		t.Fatalf("activation plan must be dry-run only: %#v", activation)
 	}
-	assertRunFails(t, []string{"plan", "activate", "--packet", f.packetPath, "--out", filepath.Join(f.root, "activation-plan.json")}, "under tmp")
+	assertRunFails(t, []string{"plan", "activate", "--packet", f.packetPath, "--out", filepath.Join("artifacts", "activation-plan.json")}, "under tmp")
 
 	activeNextPath := filepath.Join(f.tmp, "active-stack.next.json")
 	assertRunOK(t, []string{"active", "render", "--plan", activationPath, "--out", activeNextPath})
