@@ -70,10 +70,9 @@ highest proven live class at `test_only` and deny `multi_repo_low_risk` until
 completed low-risk live rehearsal evidence is recorded. Later merged evidence
 kept `fully_unsupervised_complex_mutation` proven for the governed 26-node first
 non-planning rehearsal boundary. The current highest proven live class is
-`public_safe_bounded_improvement_evidence_expansion_four_attempts`, proven only
-for four public-safe bounded evidence expansion attempts with reproducibility
-runbooks; the next denied class is
-`broad_RSI`.
+`public_safe_reviewed_causal_chain_boundary_generalization_evidence`, proven only
+for public-safe reviewed causal-chain boundary generalization evidence across
+multiple independent claim-review roles. The next denied class is `broad_RSI`.
 
 Passing this boundary does not perform live mutation and does not grant ungated
 authority. It reports whether the next class can be promoted by policy; it does
@@ -102,7 +101,7 @@ unrestricted self-modification remains denied, hidden instruction mutation
 remains denied, policy-changing autonomy remains denied, and stronger
 recursive-improvement claims remain denied. The Promoter verdict keeps the
 highest proven live class at
-`public_safe_bounded_improvement_evidence_expansion_four_attempts` and the next
+`public_safe_reviewed_causal_chain_boundary_generalization_evidence` and the next
 denied class at `broad_RSI`; it does not claim broad RSI or policy-changing
 autonomy.
 
@@ -147,3 +146,7 @@ rollback plan, clean public-safety scan, and non-default command flag.
 ## License
 
 AO Promoter is licensed under `Apache-2.0`. See `LICENSE`.
+
+`public_safe_reviewed_causal_chain_boundary_generalization_evidence` is now proven from AO Foundry PR #187, commit
+`ee55f7918b86f997922707e4c0b2ba6536fe43cf`, with tracked public evidence under
+`docs/evidence/recursive-improvement-reviewed-boundary-generalization/`. The approved public wording is exactly: "AO has public-safe reviewed causal-chain boundary generalization evidence across multiple independent claim-review roles; stronger recursive-improvement wording and broad_RSI remain denied." The highest proven live class is `public_safe_reviewed_causal_chain_boundary_generalization_evidence` and the next denied class is `broad_RSI`. Stronger recursive-improvement wording remains denied, `broad_RSI` remains denied, unrestricted self-modification remains denied, hidden instruction mutation remains denied, and policy-changing autonomy remains denied.
