@@ -70,9 +70,9 @@ highest proven live class at `test_only` and deny `multi_repo_low_risk` until
 completed low-risk live rehearsal evidence is recorded. Later merged evidence
 kept `fully_unsupervised_complex_mutation` proven for the governed 26-node first
 non-planning rehearsal boundary. The current highest proven live class is
-`exact_safe_public_claim_wording_conservative_readback_evidence`, proven only
-for conservative public-safe tracked readback evidence for bounded
-improvement-claim review and retraction rehearsal; the next denied class is
+`public_safe_bounded_improvement_evidence_expansion_four_attempts`, proven only
+for four public-safe bounded evidence expansion attempts with reproducibility
+runbooks; the next denied class is
 `broad_RSI`.
 
 Passing this boundary does not perform live mutation and does not grant ungated
@@ -102,7 +102,7 @@ unrestricted self-modification remains denied, hidden instruction mutation
 remains denied, policy-changing autonomy remains denied, and stronger
 recursive-improvement claims remain denied. The Promoter verdict keeps the
 highest proven live class at
-`exact_safe_public_claim_wording_conservative_readback_evidence` and the next
+`public_safe_bounded_improvement_evidence_expansion_four_attempts` and the next
 denied class at `broad_RSI`; it does not claim broad RSI or policy-changing
 autonomy.
 
