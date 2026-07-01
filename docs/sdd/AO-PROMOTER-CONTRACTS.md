@@ -103,7 +103,14 @@ object reports `highest_proven_live_class`,
 fresh repo-state, and kill-switch prerequisites. Without a completed
 `low_risk_code` live rehearsal, Promoter keeps the highest proven live class at
 `test_only` and denies `multi_repo_low_risk` promotion even if dry-run artifacts
-are otherwise ready.
+are otherwise ready in that fixture. Later closure evidence keeps the current
+highest proven live class at `fully_unsupervised_complex_mutation`.
+
+The bounded RSI evidence verdict is narrower than the live-mutation successor
+ladder. `verdict=promote_bounded_rsi_evidence_rehearsal` records
+`bounded_rsi_evidence_rehearsal` as live-proven evidence only. It keeps broad
+RSI, unrestricted self-modification, hidden instruction mutation, and
+policy/auth/secret/provider/deploy/release/config/dependency expansion denied.
 
 ## First Live Docs Boundary Required Evidence
 
