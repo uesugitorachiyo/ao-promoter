@@ -65,14 +65,24 @@ For the `low_risk_code` to `multi_repo_low_risk` boundary, Promoter reports
 `highest_proven_live_class`, `current_class_live_evidence_status`,
 `next_denied_class`, `next_denied_reason`, and prerequisites for ordered merge
 plan, per-repo rollback, per-repo CI, fresh repo state, and armed kill switch.
-If `low_risk_code` has only dry-run/readback evidence, the highest proven live
-class remains `test_only` and `multi_repo_low_risk` is denied until completed
-low-risk live rehearsal evidence is recorded.
+If `low_risk_code` has only dry-run/readback evidence, older fixtures keep the
+highest proven live class at `test_only` and deny `multi_repo_low_risk` until
+completed low-risk live rehearsal evidence is recorded. Later merged evidence
+now keeps the highest proven live class at `fully_unsupervised_complex_mutation`
+for the governed 26-node first non-planning rehearsal boundary.
 
 Passing this boundary does not perform live mutation and does not grant ungated
-authority. It reports whether the next class can be promoted by policy; fully
-unsupervised complex mutation remains unclaimed unless every lower class has
-completed live evidence and all gates are clear.
+authority. It reports whether the next class can be promoted by policy; it does
+not widen promotion into broad RSI, hidden instruction mutation, unrestricted
+self-modification, or policy/auth/secret/provider/deploy/release/config/
+dependency expansion.
+
+The final bounded RSI evidence verdict accepts only
+`verdict=promote_bounded_rsi_evidence_rehearsal`. That means
+`bounded_rsi_evidence_rehearsal` is live-proven as a bounded evidence rehearsal
+state, while broad RSI and unrestricted self-modification remain denied. The
+verdict keeps the highest proven live class at
+`fully_unsupervised_complex_mutation` and the next denied class at `RSI`.
 
 `promoter live-mutation docs-boundary` is the narrower dry-run promotion
 boundary for the first tiny docs-only live class. It requires an approved
