@@ -70,8 +70,10 @@ highest proven live class at `test_only` and deny `multi_repo_low_risk` until
 completed low-risk live rehearsal evidence is recorded. Later merged evidence
 kept `fully_unsupervised_complex_mutation` proven for the governed 26-node first
 non-planning rehearsal boundary. The current highest proven live class is
-`bounded_rsi_self_improvement_application`, proven only for the exact private
-readback/eval rubric rehearsal; the next denied class is `broad_RSI`.
+`exact_safe_public_claim_wording_conservative_readback_evidence`, proven only
+for conservative public-safe tracked readback evidence for bounded
+improvement-claim review and retraction rehearsal; the next denied class is
+`broad_RSI`.
 
 Passing this boundary does not perform live mutation and does not grant ungated
 authority. It reports whether the next class can be promoted by policy; it does
@@ -87,6 +89,20 @@ unrestricted self-modification remains denied, hidden instruction mutation
 remains denied, and policy/auth/secret/provider/deploy/release/config/
 dependency expansion remains denied. The Promoter verdict keeps the highest
 proven live class at `bounded_rsi_self_improvement_application` and the next
+denied class at `broad_RSI`; it does not claim broad RSI or policy-changing
+autonomy.
+
+The final exact safe public claim wording verdict accepts only the conservative
+public wording evidence. That means
+`exact_safe_public_claim_wording_conservative_readback_evidence` is proven only
+for this exact approved wording: "AO has public-safe tracked readback evidence
+for bounded improvement-claim review and retraction rehearsal; stronger
+recursive-improvement claims remain denied." `broad_RSI` remains denied,
+unrestricted self-modification remains denied, hidden instruction mutation
+remains denied, policy-changing autonomy remains denied, and stronger
+recursive-improvement claims remain denied. The Promoter verdict keeps the
+highest proven live class at
+`exact_safe_public_claim_wording_conservative_readback_evidence` and the next
 denied class at `broad_RSI`; it does not claim broad RSI or policy-changing
 autonomy.
 

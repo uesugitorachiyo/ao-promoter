@@ -106,8 +106,10 @@ fresh repo-state, and kill-switch prerequisites. Without a completed
 are otherwise ready in that fixture. Later closure evidence kept
 `fully_unsupervised_complex_mutation` proven for the governed 26-node first
 non-planning rehearsal boundary. The current highest proven live class is
-`bounded_rsi_self_improvement_application`, proven only for the exact private
-readback/eval rubric rehearsal; the next denied class is `broad_RSI`.
+`exact_safe_public_claim_wording_conservative_readback_evidence`, proven only
+for conservative public-safe tracked readback evidence for bounded
+improvement-claim review and retraction rehearsal; the next denied class is
+`broad_RSI`.
 
 The bounded RSI self-improvement application verdict is narrower than the
 live-mutation successor ladder. It records
@@ -117,6 +119,15 @@ self-modification remains denied, hidden instruction mutation remains denied,
 and policy/auth/secret/provider/deploy/release/config/dependency expansion
 remains denied. The verdict does not claim broad RSI or policy-changing
 autonomy.
+
+The exact safe public claim wording verdict is narrower still. It records
+`exact_safe_public_claim_wording_conservative_readback_evidence` as proven only
+for this approved wording: "AO has public-safe tracked readback evidence for
+bounded improvement-claim review and retraction rehearsal; stronger
+recursive-improvement claims remain denied." `broad_RSI`, unrestricted
+self-modification, hidden instruction mutation, policy-changing autonomy, and
+stronger recursive-improvement claims remain denied. The verdict does not claim
+broad RSI or policy-changing autonomy.
 
 ## First Live Docs Boundary Required Evidence
 
