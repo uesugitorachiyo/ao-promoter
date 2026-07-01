@@ -70,7 +70,7 @@ highest proven live class at `test_only` and deny `multi_repo_low_risk` until
 completed low-risk live rehearsal evidence is recorded. Later merged evidence
 kept `fully_unsupervised_complex_mutation` proven for the governed 26-node first
 non-planning rehearsal boundary. The current highest proven live class is
-`public_safe_guided_evidence_application_four_attempts`, proven only for
+`public_safe_reviewer_approved_bounded_recursive_improvement_wording_evidence`, proven only for
 public-safe guided evidence-application evidence showing causal-review guidance
 can select and prioritize later bounded evidence attempts under independent
 gates.
@@ -125,7 +125,7 @@ attempts under independent gates; stronger recursive-improvement wording and
 broad_RSI remain denied." `broad_RSI`, stronger recursive-improvement wording,
 unrestricted self-modification, hidden instruction mutation, and policy-changing
 autonomy remain denied. The Promoter verdict keeps the highest proven live class
-at `public_safe_guided_evidence_application_four_attempts` and the next denied
+at `public_safe_reviewer_approved_bounded_recursive_improvement_wording_evidence` and the next denied
 class at `broad_RSI`; it does not claim broad RSI or policy-changing autonomy.
 
 `promoter live-mutation docs-boundary` is the narrower dry-run promotion
@@ -195,8 +195,14 @@ public wording is exactly: "AO has public-safe guided evidence-application
 evidence showing causal-review guidance can select and prioritize later bounded
 evidence attempts under independent gates; stronger recursive-improvement
 wording and broad_RSI remain denied." The highest proven live class is
-`public_safe_guided_evidence_application_four_attempts` and the next denied class
+`public_safe_reviewer_approved_bounded_recursive_improvement_wording_evidence` and the next denied class
 is `broad_RSI`. Stronger recursive-improvement wording
 remains denied, `broad_RSI` remains denied, unrestricted self-modification
 remains denied, hidden instruction mutation remains denied, and policy-changing
 autonomy remains denied.
+
+## Public-Safe Reviewer-Approved Bounded Wording Evidence
+
+`public_safe_reviewer_approved_bounded_recursive_improvement_wording_evidence` is proven from AO Foundry PR #195, commit `0f742738324c185ba7243bc53ee2f1bc81804ef6`, with tracked public evidence under `docs/evidence/recursive-improvement-reviewer-approved-wording/`. The approved public wording is exactly: "AO has public-safe reviewer-approved bounded recursive-improvement wording evidence showing guided evidence application can improve later evidence attempts under independent review gates; broad_RSI remains denied." The highest proven live class is `public_safe_reviewer_approved_bounded_recursive_improvement_wording_evidence` and the next denied class is `broad_RSI`.
+
+This does not prove `broad_RSI`, unrestricted self-modification, hidden instruction mutation, policy-changing autonomy, policy/auth/secret/provider/deploy/release/config/dependency expansion, or unbounded stronger recursive-improvement claims.
