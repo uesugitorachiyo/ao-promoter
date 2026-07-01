@@ -106,9 +106,10 @@ fresh repo-state, and kill-switch prerequisites. Without a completed
 are otherwise ready in that fixture. Later closure evidence kept
 `fully_unsupervised_complex_mutation` proven for the governed 26-node first
 non-planning rehearsal boundary. The current highest proven live class is
-`public_safe_causal_review_evidence_selection_guidance`, proven only for
-public-safe causal-review evidence that prior bounded evidence can guide later
-evidence-selection and blocker prioritization under independent review gates;
+`public_safe_guided_evidence_application_four_attempts`, proven only for
+public-safe guided evidence-application evidence showing causal-review guidance
+can select and prioritize later bounded evidence attempts under independent
+gates;
 the next denied class is `broad_RSI`.
 
 The bounded RSI self-improvement application verdict is narrower than the
@@ -136,6 +137,16 @@ evidence can guide later evidence-selection and blocker prioritization under
 independent review gates; stronger recursive-improvement wording and broad_RSI
 remain denied." `broad_RSI`, stronger recursive-improvement wording,
 unrestricted self-modification, hidden instruction mutation, and policy-changing
+autonomy remain denied. This remains prior evidence. The verdict does not claim
+broad RSI or policy-changing autonomy.
+
+The guided evidence-application verdict records
+`public_safe_guided_evidence_application_four_attempts` as proven only for this
+approved wording: "AO has public-safe guided evidence-application evidence
+showing causal-review guidance can select and prioritize later bounded evidence
+attempts under independent gates; stronger recursive-improvement wording and
+broad_RSI remain denied." `broad_RSI`, stronger recursive-improvement wording,
+unrestricted self-modification, hidden instruction mutation, and policy-changing
 autonomy remain denied. The verdict does not claim broad RSI or policy-changing
 autonomy.
 
@@ -147,6 +158,17 @@ from AO Foundry PR #189, commit
 `public_safe_causal_review_evidence_selection_guidance` is proven from AO Foundry
 PR #191, commit `413b70f15d8f3d0203dc7be076914a2f3b539881`, with tracked public
 evidence under `docs/evidence/recursive-improvement-evidence-selection-guidance/`.
+
+`public_safe_guided_evidence_application_four_attempts` is proven from AO
+Foundry PR #193, commit `4ec509fd64d1fc1ea41ea7f22aae900ba79e09a1`, with
+tracked public evidence under
+`docs/evidence/recursive-improvement-guided-evidence-application/`. The approved
+public wording is exactly: "AO has public-safe guided evidence-application
+evidence showing causal-review guidance can select and prioritize later bounded
+evidence attempts under independent gates; stronger recursive-improvement
+wording and broad_RSI remain denied." Stronger recursive-improvement wording,
+`broad_RSI`, unrestricted self-modification, hidden instruction mutation, and
+policy-changing autonomy remain denied.
 
 
 ## First Live Docs Boundary Required Evidence

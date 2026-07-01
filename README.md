@@ -70,9 +70,10 @@ highest proven live class at `test_only` and deny `multi_repo_low_risk` until
 completed low-risk live rehearsal evidence is recorded. Later merged evidence
 kept `fully_unsupervised_complex_mutation` proven for the governed 26-node first
 non-planning rehearsal boundary. The current highest proven live class is
-`public_safe_causal_review_evidence_selection_guidance`, proven only for
-public-safe causal-review evidence that prior bounded evidence can guide later
-evidence-selection and blocker prioritization under independent review gates.
+`public_safe_guided_evidence_application_four_attempts`, proven only for
+public-safe guided evidence-application evidence showing causal-review guidance
+can select and prioritize later bounded evidence attempts under independent
+gates.
 The next denied class is `broad_RSI`.
 
 Passing this boundary does not perform live mutation and does not grant ungated
@@ -112,8 +113,19 @@ bounded evidence can guide later evidence-selection and blocker prioritization
 under independent review gates; stronger recursive-improvement wording and
 broad_RSI remain denied." `broad_RSI`, stronger recursive-improvement wording,
 unrestricted self-modification, hidden instruction mutation, and policy-changing
+autonomy remain denied. This remains prior evidence; it does not claim broad RSI
+or policy-changing autonomy.
+
+The final guided evidence-application verdict accepts only the narrow
+public-safe guided application evidence. That means
+`public_safe_guided_evidence_application_four_attempts` is proven only for this
+approved wording: "AO has public-safe guided evidence-application evidence
+showing causal-review guidance can select and prioritize later bounded evidence
+attempts under independent gates; stronger recursive-improvement wording and
+broad_RSI remain denied." `broad_RSI`, stronger recursive-improvement wording,
+unrestricted self-modification, hidden instruction mutation, and policy-changing
 autonomy remain denied. The Promoter verdict keeps the highest proven live class
-at `public_safe_causal_review_evidence_selection_guidance` and the next denied
+at `public_safe_guided_evidence_application_four_attempts` and the next denied
 class at `broad_RSI`; it does not claim broad RSI or policy-changing autonomy.
 
 `promoter live-mutation docs-boundary` is the narrower dry-run promotion
@@ -169,9 +181,22 @@ evidence under `docs/evidence/recursive-improvement-evidence-selection-guidance/
 The approved public wording is exactly: "AO has public-safe causal-review
 evidence that prior bounded evidence can guide later evidence-selection and
 blocker prioritization under independent review gates; stronger
-recursive-improvement wording and broad_RSI remain denied." The highest proven
-live class is `public_safe_causal_review_evidence_selection_guidance` and the
-next denied class is `broad_RSI`. Stronger recursive-improvement wording
+recursive-improvement wording and broad_RSI remain denied." This remains prior
+evidence. Stronger recursive-improvement wording remains denied, `broad_RSI`
+remains denied, unrestricted self-modification remains denied, hidden
+instruction mutation remains denied, and policy-changing autonomy remains
+denied.
+
+`public_safe_guided_evidence_application_four_attempts` is proven from AO
+Foundry PR #193, commit `4ec509fd64d1fc1ea41ea7f22aae900ba79e09a1`, with
+tracked public evidence under
+`docs/evidence/recursive-improvement-guided-evidence-application/`. The approved
+public wording is exactly: "AO has public-safe guided evidence-application
+evidence showing causal-review guidance can select and prioritize later bounded
+evidence attempts under independent gates; stronger recursive-improvement
+wording and broad_RSI remain denied." The highest proven live class is
+`public_safe_guided_evidence_application_four_attempts` and the next denied class
+is `broad_RSI`. Stronger recursive-improvement wording
 remains denied, `broad_RSI` remains denied, unrestricted self-modification
 remains denied, hidden instruction mutation remains denied, and policy-changing
 autonomy remains denied.
