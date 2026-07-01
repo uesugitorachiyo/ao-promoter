@@ -103,14 +103,20 @@ object reports `highest_proven_live_class`,
 fresh repo-state, and kill-switch prerequisites. Without a completed
 `low_risk_code` live rehearsal, Promoter keeps the highest proven live class at
 `test_only` and denies `multi_repo_low_risk` promotion even if dry-run artifacts
-are otherwise ready in that fixture. Later closure evidence keeps the current
-highest proven live class at `fully_unsupervised_complex_mutation`.
+are otherwise ready in that fixture. Later closure evidence kept
+`fully_unsupervised_complex_mutation` proven for the governed 26-node first
+non-planning rehearsal boundary. The current highest proven live class is
+`bounded_rsi_self_improvement_application`, proven only for the exact private
+readback/eval rubric rehearsal; the next denied class is `broad_RSI`.
 
-The bounded RSI evidence verdict is narrower than the live-mutation successor
-ladder. `verdict=promote_bounded_rsi_evidence_rehearsal` records
-`bounded_rsi_evidence_rehearsal` as live-proven evidence only. It keeps broad
-RSI, unrestricted self-modification, hidden instruction mutation, and
-policy/auth/secret/provider/deploy/release/config/dependency expansion denied.
+The bounded RSI self-improvement application verdict is narrower than the
+live-mutation successor ladder. It records
+`bounded_rsi_self_improvement_application` as proven only for the exact private
+readback/eval rubric rehearsal. `broad_RSI` remains denied, unrestricted
+self-modification remains denied, hidden instruction mutation remains denied,
+and policy/auth/secret/provider/deploy/release/config/dependency expansion
+remains denied. The verdict does not claim broad RSI or policy-changing
+autonomy.
 
 ## First Live Docs Boundary Required Evidence
 

@@ -68,8 +68,10 @@ plan, per-repo rollback, per-repo CI, fresh repo state, and armed kill switch.
 If `low_risk_code` has only dry-run/readback evidence, older fixtures keep the
 highest proven live class at `test_only` and deny `multi_repo_low_risk` until
 completed low-risk live rehearsal evidence is recorded. Later merged evidence
-now keeps the highest proven live class at `fully_unsupervised_complex_mutation`
-for the governed 26-node first non-planning rehearsal boundary.
+kept `fully_unsupervised_complex_mutation` proven for the governed 26-node first
+non-planning rehearsal boundary. The current highest proven live class is
+`bounded_rsi_self_improvement_application`, proven only for the exact private
+readback/eval rubric rehearsal; the next denied class is `broad_RSI`.
 
 Passing this boundary does not perform live mutation and does not grant ungated
 authority. It reports whether the next class can be promoted by policy; it does
@@ -77,12 +79,16 @@ not widen promotion into broad RSI, hidden instruction mutation, unrestricted
 self-modification, or policy/auth/secret/provider/deploy/release/config/
 dependency expansion.
 
-The final bounded RSI evidence verdict accepts only
-`verdict=promote_bounded_rsi_evidence_rehearsal`. That means
-`bounded_rsi_evidence_rehearsal` is live-proven as a bounded evidence rehearsal
-state, while broad RSI and unrestricted self-modification remain denied. The
-verdict keeps the highest proven live class at
-`fully_unsupervised_complex_mutation` and the next denied class at `RSI`.
+The final bounded RSI self-improvement application verdict accepts only the
+exact private readback/eval rubric rehearsal. That means
+`bounded_rsi_self_improvement_application` is proven only for that exact
+private readback/eval rubric rehearsal. `broad_RSI` remains denied,
+unrestricted self-modification remains denied, hidden instruction mutation
+remains denied, and policy/auth/secret/provider/deploy/release/config/
+dependency expansion remains denied. The Promoter verdict keeps the highest
+proven live class at `bounded_rsi_self_improvement_application` and the next
+denied class at `broad_RSI`; it does not claim broad RSI or policy-changing
+autonomy.
 
 `promoter live-mutation docs-boundary` is the narrower dry-run promotion
 boundary for the first tiny docs-only live class. It requires an approved
