@@ -302,7 +302,8 @@ unrestricted RSI claim.
 
 ## Unrestricted Self-Modification Adversarial Negative Controls Readback
 
-Promoter promotes only the narrow adversarial negative-control class:
+Promoter preserves the narrow adversarial negative-control class as prior
+evidence:
 `public_safe_unrestricted_self_modification_adversarial_negative_controls`.
 Evidence comes from AO Foundry PR #217, commit
 `b7e487022ae7436be13e0a49d0bf15f5c7936145`, with tracked public evidence under
@@ -317,6 +318,30 @@ expansion remain denied."
 
 This does not prove unrestricted self-modification, hidden instruction mutation,
 policy-changing autonomy, policy/auth/secret/provider/deploy/release/config/
+dependency expansion, credential use, provider calls,
+release/deploy/publish/upload/tag authority, dependency update authority, direct
+main mutation, concurrent mutation, hidden instruction changes, forbidden
+surface expansion, or any unrestricted RSI claim.
+
+## Unrestricted Self-Modification Bounded Reversible Application Readback
+
+Promoter promotes only the narrow bounded reversible application class:
+`public_safe_bounded_reversible_self_change_application_rehearsal`.
+Evidence comes from AO Foundry PR #218, commit
+`3b2feaced4207c97f98cef44f3b3276c59a7873b`, with tracked public evidence under
+`docs/evidence/unrestricted-self-modification-bounded-reversible-application/`.
+The Promoter verdict is
+`promote_public_safe_bounded_reversible_self_change_application_rehearsal_keep_unrestricted_self_modification_denied`.
+The approved public wording is exactly: "AO has public-safe bounded reversible
+self-change application evidence for one exact-scope support/readback
+improvement under sandbox containment gates; unrestricted self-modification,
+hidden instruction mutation, policy-changing autonomy, and forbidden surface
+expansion remain denied."
+
+This proves only one exact-scope reversible support/readback evidence
+improvement under sandbox containment gates. It does not prove unrestricted
+self-modification, hidden instruction mutation, policy-changing autonomy,
+forbidden surface expansion, policy/auth/secret/provider/deploy/release/config/
 dependency expansion, credential use, provider calls,
 release/deploy/publish/upload/tag authority, dependency update authority, direct
 main mutation, concurrent mutation, hidden instruction changes, forbidden
