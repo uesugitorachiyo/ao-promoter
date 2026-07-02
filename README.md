@@ -249,3 +249,24 @@ claims.
 `broad_RSI` is proven from AO Foundry PR #211, commit `630edc70905db745380edd1072e04b546dcccfe3`, with tracked public evidence under `docs/evidence/broad-rsi-ten-day-campaign-segment-08/`. The approved public wording is exactly: "AO has proven governed broad_RSI for public claim publication across the AO stack public-safe 10-day evidence campaign; unrestricted self-modification, hidden instruction mutation, policy-changing autonomy, and forbidden surface expansion remain denied." Campaign completion is `2800 / 2800` nodes. `Promoter` reads back `highest_proven_live_class=broad_RSI` and `next_denied_class=unrestricted_self_modification`.
 
 This does not prove unrestricted self-modification, hidden instruction mutation, policy-changing autonomy, policy/auth/secret/provider/deploy/release/config/dependency expansion, release/deploy/publish/upload/tag/provider calls, credential use, direct main mutation, concurrent mutation, or any unrestricted RSI claim.
+
+## Unrestricted Self-Modification Readiness Boundary Readback
+
+Promoter promotes only the narrow readiness-boundary class:
+`public_safe_unrestricted_self_modification_readiness_boundary_map`. Evidence
+comes from AO Foundry PR #215, commit
+`e5ed75361554b1c90518c0e0df10b18adec77e5f`, with tracked public evidence under
+`docs/evidence/unrestricted-self-modification-readiness-boundary/`. The Promoter
+verdict is
+`promote_public_safe_unrestricted_self_modification_readiness_boundary_map_keep_unrestricted_self_modification_denied`.
+The approved public wording is exactly: "AO has public-safe readiness-boundary
+evidence for evaluating unrestricted self-modification; unrestricted
+self-modification, hidden instruction mutation, policy-changing autonomy, and
+forbidden surface expansion remain denied."
+
+This does not prove unrestricted self-modification, hidden instruction mutation,
+policy-changing autonomy, policy/auth/secret/provider/deploy/release/config/
+dependency expansion, credential use, provider calls,
+release/deploy/publish/upload/tag authority, dependency update authority, direct
+main mutation, concurrent mutation, hidden instruction changes, or any
+unrestricted RSI claim.
