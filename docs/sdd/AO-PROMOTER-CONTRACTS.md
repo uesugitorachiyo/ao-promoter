@@ -346,3 +346,27 @@ dependency expansion, credential use, provider calls,
 release/deploy/publish/upload/tag authority, dependency update authority, direct
 main mutation, concurrent mutation, hidden instruction changes, forbidden
 surface expansion, or any unrestricted RSI claim.
+
+## Repeated Bounded Reversible Self-Change Applications Readback
+
+Promoter promotes only the narrow repeated bounded applications class:
+`public_safe_repeated_bounded_reversible_self_change_applications_four_attempts`.
+Evidence comes from AO Foundry PR #219, commit
+`88b52ce1ca9e8679cccdc64fe21c2b63340076b5`, with tracked public evidence under
+`docs/evidence/unrestricted-self-modification-repeated-bounded-applications/`.
+The Promoter verdict is
+`promote_public_safe_repeated_bounded_reversible_self_change_applications_four_attempts_keep_unrestricted_self_modification_denied`.
+The approved public wording is exactly: "AO has public-safe repeated bounded
+reversible self-change application evidence across four exact-scope
+support/readback attempts under sandbox containment gates; unrestricted
+self-modification, hidden instruction mutation, policy-changing autonomy, and
+forbidden surface expansion remain denied."
+
+This proves only four public-safe, exact-scope, reversible support/readback
+evidence attempts under sandbox containment gates. It does not prove
+unrestricted self-modification, hidden instruction mutation, policy-changing
+autonomy, forbidden surface expansion, policy/auth/secret/provider/deploy/
+release/config/dependency expansion, credential use, provider calls,
+release/deploy/publish/upload/tag authority, dependency update authority, direct
+main mutation, concurrent mutation, hidden instruction changes, or any
+unrestricted RSI claim.
