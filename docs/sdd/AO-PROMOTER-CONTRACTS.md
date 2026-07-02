@@ -279,17 +279,17 @@ Allowed statuses:
 
 This does not prove unrestricted self-modification, hidden instruction mutation, policy-changing autonomy, policy/auth/secret/provider/deploy/release/config/dependency expansion, release/deploy/publish/upload/tag/provider calls, credential use, direct main mutation, concurrent mutation, or any unrestricted RSI claim.
 
-## Unrestricted Self-Modification Readiness Boundary Readback
+## Unrestricted Self-Modification Sandbox Containment Readback
 
-Promoter promotes only the narrow readiness-boundary class:
-`public_safe_unrestricted_self_modification_readiness_boundary_map`. Evidence
-comes from AO Foundry PR #215, commit
-`e5ed75361554b1c90518c0e0df10b18adec77e5f`, with tracked public evidence under
-`docs/evidence/unrestricted-self-modification-readiness-boundary/`. The Promoter
+Promoter promotes only the narrow sandbox-containment class:
+`public_safe_unrestricted_self_modification_sandbox_containment_rehearsal`. Evidence
+comes from AO Foundry PR #216, commit
+`7881613065de48f2547833a9ecc9a9011b55a96a`, with tracked public evidence under
+`docs/evidence/unrestricted-self-modification-sandbox-containment/`. The Promoter
 verdict is
-`promote_public_safe_unrestricted_self_modification_readiness_boundary_map_keep_unrestricted_self_modification_denied`.
-The approved public wording is exactly: "AO has public-safe readiness-boundary
-evidence for evaluating unrestricted self-modification; unrestricted
+`promote_public_safe_unrestricted_self_modification_sandbox_containment_rehearsal_keep_unrestricted_self_modification_denied`.
+The approved public wording is exactly: "AO has public-safe sandbox containment evidence for
+dry-run self-change proposal evaluation; unrestricted
 self-modification, hidden instruction mutation, policy-changing autonomy, and
 forbidden surface expansion remain denied."
 
