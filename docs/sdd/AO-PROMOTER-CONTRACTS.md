@@ -272,3 +272,9 @@ Allowed statuses:
   scheduling, execution, approval, provider, release, or publication authority.
 - Deny mutation-class promotion when completed live rehearsal evidence,
   class-bound rollback proof, clean `main` CI, or clear hold evidence is absent.
+
+## Governed Broad RSI Campaign Completion Readback
+
+`broad_RSI` is proven from AO Foundry PR #211, commit `630edc70905db745380edd1072e04b546dcccfe3`, with tracked public evidence under `docs/evidence/broad-rsi-ten-day-campaign-segment-08/`. The approved public wording is exactly: "AO has proven governed broad_RSI for public claim publication across the AO stack public-safe 10-day evidence campaign; unrestricted self-modification, hidden instruction mutation, policy-changing autonomy, and forbidden surface expansion remain denied." Campaign completion is `2800 / 2800` nodes. `Promoter` reads back `highest_proven_live_class=broad_RSI` and `next_denied_class=unrestricted_self_modification`.
+
+This does not prove unrestricted self-modification, hidden instruction mutation, policy-changing autonomy, policy/auth/secret/provider/deploy/release/config/dependency expansion, release/deploy/publish/upload/tag/provider calls, credential use, direct main mutation, concurrent mutation, or any unrestricted RSI claim.
