@@ -170,12 +170,12 @@ wording and broad_RSI remain denied." Stronger recursive-improvement wording,
 `broad_RSI`, unrestricted self-modification, hidden instruction mutation, and
 policy-changing autonomy remain denied.
 
-`public_safe_broad_RSI_governed_campaign_segment_05_evidence` is proven from AO
-Foundry PR #208, commit `54fb7c8210b169f71953d52d28e0e69f1c5aad1a`, with
-tracked public evidence under `docs/evidence/broad-rsi-ten-day-campaign-segment-05/`.
+`public_safe_broad_RSI_governed_campaign_segment_07_evidence` is proven from AO
+Foundry PR #210, commit `8f8ac5f8f74d942c7a02a6c2dd39a7c974872bb6`, with
+tracked public evidence under `docs/evidence/broad-rsi-ten-day-campaign-segment-07/`.
 Promoter may read back only
-`promote_public_safe_broad_RSI_governed_campaign_segment_05_evidence_broad_RSI_denied`.
-The approved wording is segment-05 evidence only; `broad_RSI`, full 10-day
+`promote_public_safe_broad_RSI_governed_campaign_segment_07_evidence_broad_RSI_denied`.
+The approved wording is segment-07 evidence only; `broad_RSI`, full 10-day
 campaign completion, unrestricted self-modification, hidden instruction
 mutation, policy-changing autonomy, and forbidden surface expansion remain
 denied.
