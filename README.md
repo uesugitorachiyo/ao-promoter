@@ -226,6 +226,22 @@ This does not prove `broad_RSI`, unrestricted self-modification, hidden instruct
 
 This does not prove `broad_RSI`, full 10-day campaign completion, final repeated independent broad evidence, final cross-repo generality proof for `broad_RSI`, exact `broad_RSI` public-reader approval, exact `broad_RSI` Covenant or Architecture approval, unrestricted self-modification, hidden instruction mutation, policy-changing autonomy, policy/auth/secret/provider/deploy/release/config/dependency expansion, release/deploy/publish/upload/tag/provider calls, credential use, direct main mutation, concurrent mutation, or unbounded stronger recursive-improvement claims.
 
+## Bounded Sandboxed Self-Change Application Readback
+
+`public_safe_bounded_sandboxed_self_change_applications_non_readback_four_attempts`
+is proven from AO Foundry PR #220, commit
+`eff03edd62ba32af57defc71a7f3b800f320b8d3`, with tracked public evidence under
+`docs/evidence/unrestricted-self-modification-bounded-sandbox-applications/`.
+Promoter verdict:
+`promote_public_safe_bounded_sandboxed_self_change_applications_non_readback_four_attempts_keep_unrestricted_self_modification_denied`.
+The approved public wording is exactly: "AO has public-safe bounded sandboxed
+self-change application evidence across four non-readback exact-scope evidence
+tasks under sandbox containment gates; unrestricted self-modification, hidden
+instruction mutation, policy-changing autonomy, and forbidden surface expansion
+remain denied." The highest proven live class is
+`public_safe_bounded_sandboxed_self_change_applications_non_readback_four_attempts`;
+the next denied class is `unrestricted_self_modification`.
+
 ## Broad RSI Ten-Day Governed Campaign Segment 07 Readback
 
 Promoter promotes only the narrow segment-07 class:
