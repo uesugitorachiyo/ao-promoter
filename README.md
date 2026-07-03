@@ -70,10 +70,10 @@ highest proven live class at `test_only` and deny `multi_repo_low_risk` until
 completed low-risk live rehearsal evidence is recorded. Later merged evidence
 kept `fully_unsupervised_complex_mutation` proven for the governed 26-node first
 non-planning rehearsal boundary. The current highest proven live class is
-`public_safe_bounded_sandboxed_self_change_sandbox_boundary_generality_four_attempts`,
-proven only for public-safe bounded sandboxed self-change sandbox-boundary
-generality evidence across four additional exact-scope reversible attempts under
-sandbox containment gates.
+`public_safe_external_execution_authority_boundary_fixture_evidence_four_attempts`,
+proven only for public-safe external-execution-authority boundary fixture
+evidence across four exact-scope reversible attempts under sandbox containment
+gates.
 The next denied class is `unrestricted_self_modification`.
 
 Passing this boundary does not perform live mutation and does not grant ungated
@@ -422,6 +422,12 @@ This keeps `unrestricted_self_modification`, hidden instruction mutation, policy
 AO Promoter promotes only `public_safe_bounded_sandboxed_self_change_sandbox_boundary_stress_four_attempts` from AO Foundry PR #225, commit `8297e87cb32b8889a205ac6d38736e32004ba824`, with tracked public evidence under `docs/evidence/unrestricted-self-modification-sandbox-boundary-stress/` and final rollup `docs/evidence/unrestricted-self-modification-sandbox-boundary-stress/final-rollup.json`. The Promoter verdict is `promote_public_safe_bounded_sandboxed_self_change_sandbox_boundary_stress_four_attempts_keep_unrestricted_self_modification_denied`. The approved public wording is exactly: "AO has public-safe bounded sandboxed self-change sandbox-boundary stress evidence across four exact-scope reversible attempts under sandbox containment gates; unrestricted self-modification, hidden instruction mutation, policy-changing autonomy, forbidden surface expansion, sandbox containment bypass, and external execution authority remain denied."
 
 This keeps `unrestricted_self_modification`, sandbox containment bypass, external execution authority, hidden instruction mutation, policy-changing autonomy, forbidden surface expansion, and unrestricted RSI denied.
+
+## External Execution Authority Boundary Promotion Readback
+
+AO Promoter promotes only `public_safe_external_execution_authority_boundary_fixture_evidence_four_attempts` from AO Foundry PR #229, commit `fcd734c1907c3649166334a5b15c42d0e2e990de`, with tracked public evidence under `docs/evidence/external-execution-authority-boundary/` and final rollup `docs/evidence/external-execution-authority-boundary/final-rollup.json`. The Promoter verdict is `promote_public_safe_external_execution_authority_boundary_fixture_evidence_four_attempts_keep_unrestricted_self_modification_denied`. The approved public wording is exactly: "AO has public-safe external-execution-authority boundary fixture evidence across four exact-scope reversible attempts under sandbox containment gates; actual external execution authority, provider calls, credential use, unrestricted self-modification, hidden instruction mutation, policy-changing autonomy, forbidden surface expansion, and sandbox containment bypass remain denied."
+
+This keeps actual external execution authority, provider calls, credential use, `unrestricted_self_modification`, sandbox containment bypass, hidden instruction mutation, policy-changing autonomy, forbidden surface expansion, and unrestricted RSI denied.
 
 ## Sandbox-Boundary Generality Promotion Readback
 
