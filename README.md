@@ -442,6 +442,28 @@ This keeps `unrestricted_self_modification`, hidden instruction mutation, policy
 
 ## Sandboxed External-Execution Dry-Run Packet Promotion Readback
 
-AO Promoter promotes only the narrow class `public_safe_sandboxed_external_execution_dry_run_packet_evidence_four_attempts` from AO Foundry PR #231, commit `18a609f430a9a7e91fc0e62aea4b5789144c9fec`, with tracked public evidence under `docs/evidence/sandboxed-external-execution-dry-run-packet/` and final rollup `docs/evidence/sandboxed-external-execution-dry-run-packet/final-rollup.json`. The Promoter verdict is `promote_public_safe_sandboxed_external_execution_dry_run_packet_evidence_four_attempts_keep_unrestricted_self_modification_denied`. The approved public wording is exactly: "AO has public-safe sandboxed external-execution dry-run authority packet evidence across four exact-scope reversible attempts under sandbox containment gates; actual external execution authority, provider calls, credential use, sandbox containment bypass, unrestricted self-modification, hidden instruction mutation, policy-changing autonomy, and forbidden surface expansion remain denied."
+AO Promoter promotes only the narrow class `public_safe_sandboxed_external_execution_dry_run_packet_evidence_four_attempts` from AO Foundry PR #231, commit `18a609f430a9a7e91fc0e62aea4b5789144c9fec`, with tracked public evidence under `docs/evidence/sandboxed-external-execution-dry-run-packet/` and final rollup `docs/evidence/sandboxed-external-execution-dry-run-packet/final-rollup.json`. The Promoter verdict is `promote_public_safe_sandboxed_external_execution_dry_run_packet_evidence_four_attempts_keep_unrestricted_self_modification_denied`. The approved public wording is exactly: "AO has public-safe sandboxed external-execution dry-run authority packet evidence across four exact-scope reversible attempts under sandbox containment gates; actual external execution authority, provider calls, credential use, sandbox containment bypass, unrestricted self-modification, hidden instruction mutation, policy-changing autonomy, and forbidden surface expansion remain denied." This remains prior evidence.
 
 This keeps actual external execution authority, provider calls, credential use, `unrestricted_self_modification`, sandbox containment bypass, hidden instruction mutation, policy-changing autonomy, forbidden surface expansion, and unrestricted RSI denied.
+
+## External-Execution Authority Readiness Boundary Promotion Readback
+
+AO Promoter promotes only the narrow class
+`public_safe_external_execution_authority_readiness_boundary_map` from AO Foundry
+PR #232, commit `b6f409946775bc19a04f5ca25a9aea91b9631707`, with tracked public
+evidence under `docs/evidence/external-execution-authority-readiness-boundary/`
+and final rollup
+`docs/evidence/external-execution-authority-readiness-boundary/final-rollup.json`.
+The Promoter verdict is
+`promote_public_safe_external_execution_authority_readiness_boundary_map_actual_external_execution_denied_unrestricted_self_modification_denied`.
+The approved public wording is exactly: "AO has public-safe external-execution
+authority readiness-boundary evidence across four exact-scope reversible dry-run
+attempts under sandbox containment gates; actual external execution authority,
+provider calls, credential use, sandbox containment bypass, unrestricted
+self-modification, hidden instruction mutation, policy-changing autonomy, and
+forbidden surface expansion remain denied."
+
+This keeps actual external execution authority, provider calls, credential use,
+`unrestricted_self_modification`, sandbox containment bypass, hidden instruction
+mutation, policy-changing autonomy, forbidden surface expansion, and
+unrestricted RSI denied.
