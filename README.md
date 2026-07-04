@@ -213,6 +213,16 @@ This does not prove `broad_RSI`, unrestricted self-modification, hidden instruct
 
 `public_safe_bounded_recursive_improvement_review_durability_evidence` is proven from AO Foundry PR #199, commit `12d524b60c200cab643e44f9105169b045602798`, with tracked public evidence under `docs/evidence/recursive-improvement-review-durability/`. The approved public wording is exactly: "AO has public-safe bounded recursive-improvement review durability evidence showing bounded recursive-improvement wording remains stable across delayed re-review, adversarial drift checks, stale-language sweeps, and reproducibility retests under independent gates; broad_RSI remains denied." This remains prior evidence; the current highest proven live class is `public_safe_repeated_bounded_reversible_self_change_applications_four_attempts` and the next denied class is `unrestricted_self_modification`.
 
+## AO Mission Gateway No-Promotion Readback
+
+AO Mission gateway readbacks are no-promotion evidence. Telegram and A2A intents cannot promote classes, approve policy, execute mutation, or widen authority.
+Scheduler recovery and ledger compaction are readback only; timeline compaction is readback only;
+they may support Atlas and Foundry provenance binding, but they do not satisfy a
+Promoter class gate by themselves. The Promoter readback for Mission gateway
+artifacts remains `promotion_allowed=false` unless a separate exact-scope
+Covenant, Sentinel, Command, rollback, CI, and class-evidence packet proves the
+target class.
+
 
 `public_safe_recursive_improvement_claim_threshold_calibration_evidence` is proven from AO Foundry PR #201, commit `3e3d1101da112fa5ff0aca26f8ab2933652f3502`, with tracked public evidence under
 `docs/evidence/recursive-improvement-claim-threshold-calibration/`. The approved public wording is exactly: "AO has public-safe recursive-improvement claim threshold calibration evidence showing stronger bounded recursive-improvement claims can be evaluated against reproducible threshold, public-reader, adversarial wording, Covenant, Sentinel, rollback, and retraction gates; broad_RSI remains denied." This remains prior evidence; the current highest proven live class is `public_safe_repeated_bounded_reversible_self_change_applications_four_attempts` and the next denied class is `unrestricted_self_modification`.

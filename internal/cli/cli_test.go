@@ -158,6 +158,25 @@ func TestEvidenceInspectReportsDigestStatus(t *testing.T) {
 	}
 }
 
+func TestReadmeDocumentsAOMissionGatewayNoPromotionBoundary(t *testing.T) {
+	readme, err := os.ReadFile(filepath.Join("..", "..", "README.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	doc := string(readme)
+	for _, want := range []string{
+		"AO Mission Gateway No-Promotion Readback",
+		"gateway readbacks are no-promotion evidence",
+		"Telegram and A2A intents cannot promote classes",
+		"timeline compaction is readback only",
+		"promotion_allowed=false",
+	} {
+		if !strings.Contains(doc, want) {
+			t.Fatalf("README missing AO Mission gateway no-promotion wording %q", want)
+		}
+	}
+}
+
 func TestLiveMutationBoundary(t *testing.T) {
 	f := newFixtureSet(t)
 	paths := f.liveMutationEvidencePaths(t, false, false)
