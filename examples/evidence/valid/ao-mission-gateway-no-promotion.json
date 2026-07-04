@@ -1,0 +1,19 @@
+{
+  "schema_version": "ao.promoter.mission-gateway-no-promotion.v0.1",
+  "status": "ready",
+  "subject": "ao-mission-gateway-readiness-rollup",
+  "promotion_allowed": false,
+  "activation_plan_allowed": false,
+  "class_promotion_allowed": false,
+  "gateway_authority": "intent_readback_only",
+  "safe_to_execute": false,
+  "executes_work": false,
+  "approves_work": false,
+  "mutates_repositories": false,
+  "provider_calls_allowed": false,
+  "release_or_publish_allowed": false,
+  "credential_use_allowed": false,
+  "direct_main_mutation_allowed": false,
+  "concurrent_mutation_allowed": false,
+  "exact_next_action": "keep AO Mission gateway evidence as no-promotion readback unless a separate exact-scope promotion packet passes all gates"
+}

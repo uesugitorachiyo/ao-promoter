@@ -177,6 +177,40 @@ func TestReadmeDocumentsAOMissionGatewayNoPromotionBoundary(t *testing.T) {
 	}
 }
 
+func TestAOMissionGatewayNoPromotionFixtureStaysReadOnly(t *testing.T) {
+	body, err := os.ReadFile(filepath.Join("..", "..", "examples", "evidence", "valid", "ao-mission-gateway-no-promotion.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var fixture map[string]any
+	if err := json.Unmarshal(body, &fixture); err != nil {
+		t.Fatal(err)
+	}
+	if fixture["schema_version"] != "ao.promoter.mission-gateway-no-promotion.v0.1" ||
+		fixture["status"] != "ready" ||
+		fixture["gateway_authority"] != "intent_readback_only" {
+		t.Fatalf("bad Mission gateway no-promotion fixture: %#v", fixture)
+	}
+	for _, key := range []string{
+		"promotion_allowed",
+		"activation_plan_allowed",
+		"class_promotion_allowed",
+		"safe_to_execute",
+		"executes_work",
+		"approves_work",
+		"mutates_repositories",
+		"provider_calls_allowed",
+		"release_or_publish_allowed",
+		"credential_use_allowed",
+		"direct_main_mutation_allowed",
+		"concurrent_mutation_allowed",
+	} {
+		if fixture[key] != false {
+			t.Fatalf("Mission gateway no-promotion fixture %s = %#v, want false", key, fixture[key])
+		}
+	}
+}
+
 func TestLiveMutationBoundary(t *testing.T) {
 	f := newFixtureSet(t)
 	paths := f.liveMutationEvidencePaths(t, false, false)
