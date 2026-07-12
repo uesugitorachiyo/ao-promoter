@@ -95,6 +95,8 @@ func Run(args []string, stdout, stderr io.Writer) int {
 		err = runSafety(args[1:], stdout)
 	case "live-mutation":
 		err = runLiveMutation(args[1:], stdout)
+	case "mission":
+		err = runMission(args[1:], stdout)
 	default:
 		err = fmt.Errorf("unknown command %q", args[0])
 	}
@@ -119,10 +121,11 @@ Usage:
   promoter apply --plan <path> --dry-run --out <json>
   promoter evidence inspect --packet <path>
   promoter safety scan --path <path> --out <json>
+  promoter mission rollup-summary --no-promotion <json> --out <json>
   promoter live-mutation boundary --authority <json> --foundry-request <json> --forge-plan <json> --ao2-packet <json> --sentinel-hold <json> --rollback <json> --command-status <json> --out <json>
   promoter live-mutation docs-boundary --approval-ticket <json> --foundry-gate <json> --forge-guard <json> --ao2-packet <json> --sentinel-verdict <json> --rollback <json> --command-readback <json> --out <json>
 
-Commands: candidate packet gates plan active rollback report apply evidence safety live-mutation`)
+Commands: candidate packet gates plan active rollback report apply evidence safety mission live-mutation`)
 }
 
 func runCandidate(args []string, stdout io.Writer) error {
@@ -488,6 +491,92 @@ func runSafety(args []string, stdout io.Writer) error {
 	}
 	fmt.Fprintln(stdout, "safety scan: passed")
 	return nil
+}
+
+func runMission(args []string, stdout io.Writer) error {
+	if len(args) == 0 || args[0] != "rollup-summary" {
+		return errors.New("mission command requires rollup-summary")
+	}
+	noPromotionPath, err := flagValue(args[1:], "--no-promotion")
+	if err != nil {
+		return err
+	}
+	out, err := flagValue(args[1:], "--out")
+	if err != nil {
+		return err
+	}
+	if err := requireTmpOutput(out); err != nil {
+		return err
+	}
+	summary, err := missionRollupSummary(noPromotionPath)
+	if err != nil {
+		return err
+	}
+	if err := writeJSON(out, summary); err != nil {
+		return err
+	}
+	fmt.Fprintf(stdout, "mission_rollup_summary=%s\n", out)
+	return nil
+}
+
+func missionRollupSummary(noPromotionPath string) (map[string]any, error) {
+	noPromotion, err := readJSONMap(noPromotionPath)
+	if err != nil {
+		return nil, err
+	}
+	if stringField(noPromotion, "schema_version") != "ao.promoter.mission-gateway-no-promotion.v0.1" {
+		return nil, errors.New("mission no-promotion artifact schema_version mismatch")
+	}
+	if stringField(noPromotion, "status") != "ready" {
+		return nil, errors.New("mission no-promotion artifact must be ready")
+	}
+	for _, key := range []string{
+		"promotion_allowed",
+		"activation_plan_allowed",
+		"class_promotion_allowed",
+		"safe_to_execute",
+		"executes_work",
+		"approves_work",
+		"mutates_repositories",
+		"provider_calls_allowed",
+		"release_or_publish_allowed",
+		"credential_use_allowed",
+		"direct_main_mutation_allowed",
+		"concurrent_mutation_allowed",
+	} {
+		if boolField(noPromotion, key) {
+			return nil, fmt.Errorf("mission no-promotion artifact widens %s", key)
+		}
+	}
+	nextAction := "keep AO Mission gateway and timeline evidence as no-promotion readback unless a separate exact-scope promotion packet passes all gates"
+	return map[string]any{
+		"schema_version":                    "ao.promoter.mission-rollup-summary.v0.1",
+		"status":                            "ready",
+		"subject":                           stringField(noPromotion, "subject"),
+		"promotion_rollup_status":           "no_promotion",
+		"promotion_count":                   0,
+		"no_promotion_count":                1,
+		"mission_no_promotion_rollup_bound": true,
+		"no_promotion_artifact":             filepath.ToSlash(noPromotionPath),
+		"operator_status":                   "no_promotion_requested",
+		"read_only_operator_status":         true,
+		"operator_summary":                  "No promotion requested. AO Mission gateway evidence is recorded as read-only no-promotion status.",
+		"operator_next_action":              nextAction,
+		"promotion_allowed":                 false,
+		"activation_plan_allowed":           false,
+		"class_promotion_allowed":           false,
+		"safe_to_execute":                   false,
+		"executes_work":                     false,
+		"approves_work":                     false,
+		"mutates_repositories":              false,
+		"provider_calls_allowed":            false,
+		"release_or_publish_allowed":        false,
+		"credential_use_allowed":            false,
+		"direct_main_mutation_allowed":      false,
+		"concurrent_mutation_allowed":       false,
+		"generated_at_utc":                  nowUTC(),
+		"exact_next_action":                 nextAction,
+	}, nil
 }
 
 func runLiveMutation(args []string, stdout io.Writer) error {

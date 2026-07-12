@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -17,7 +18,7 @@ func TestHelpListsExpectedCommandsAndUnknownCommandFails(t *testing.T) {
 	if code := Run([]string{"--help"}, &out, &err); code != 0 {
 		t.Fatalf("help exit code = %d, stderr = %s", code, err.String())
 	}
-	for _, want := range []string{"candidate", "packet", "gates", "plan", "active", "rollback", "report", "apply", "evidence", "safety", "live-mutation", "docs-boundary"} {
+	for _, want := range []string{"candidate", "packet", "gates", "plan", "active", "rollback", "report", "apply", "evidence", "safety", "mission", "live-mutation", "docs-boundary"} {
 		if !strings.Contains(out.String(), want) {
 			t.Fatalf("help output missing %q:\n%s", want, out.String())
 		}
@@ -207,6 +208,62 @@ func TestAOMissionGatewayNoPromotionFixtureStaysReadOnly(t *testing.T) {
 	} {
 		if fixture[key] != false {
 			t.Fatalf("Mission gateway no-promotion fixture %s = %#v, want false", key, fixture[key])
+		}
+	}
+}
+
+func TestAOMissionRollupSummaryBindsOperatorNoPromotionReadback(t *testing.T) {
+	outPath := filepath.Join("tmp", "ao-mission-promotion-rollup-summary-test.json")
+	t.Cleanup(func() { _ = os.Remove(outPath) })
+	var stdout, stderr bytes.Buffer
+	code := Run([]string{
+		"mission", "rollup-summary",
+		"--no-promotion", filepath.Join("..", "..", "examples", "evidence", "valid", "ao-mission-gateway-no-promotion.json"),
+		"--out", outPath,
+	}, &stdout, &stderr)
+	if code != 0 {
+		t.Fatalf("mission rollup summary failed: code=%d stdout=%s stderr=%s", code, stdout.String(), stderr.String())
+	}
+	if !strings.Contains(stdout.String(), "mission_rollup_summary="+outPath) {
+		t.Fatalf("stdout missing rollup output path: %s", stdout.String())
+	}
+	body, err := os.ReadFile(outPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var summary map[string]any
+	if err := json.Unmarshal(body, &summary); err != nil {
+		t.Fatal(err)
+	}
+	if summary["schema_version"] != "ao.promoter.mission-rollup-summary.v0.1" || summary["status"] != "ready" {
+		t.Fatalf("bad mission rollup summary: %#v", summary)
+	}
+	if summary["promotion_count"] != float64(0) || summary["no_promotion_count"] != float64(1) || summary["promotion_allowed"] != false {
+		t.Fatalf("mission rollup summary did not preserve no-promotion outcome: %#v", summary)
+	}
+	if summary["mission_no_promotion_rollup_bound"] != true || summary["promotion_rollup_status"] != "no_promotion" {
+		t.Fatalf("mission rollup summary did not bind no-promotion rollup: %#v", summary)
+	}
+	if summary["operator_status"] != "no_promotion_requested" || summary["read_only_operator_status"] != true {
+		t.Fatalf("mission rollup summary missing operator status: %#v", summary)
+	}
+	if !strings.Contains(fmt.Sprint(summary["operator_summary"]), "No promotion requested") ||
+		!strings.Contains(fmt.Sprint(summary["operator_next_action"]), "keep AO Mission gateway") {
+		t.Fatalf("mission rollup summary missing operator-facing wording: %#v", summary)
+	}
+	for _, key := range []string{
+		"safe_to_execute",
+		"executes_work",
+		"approves_work",
+		"mutates_repositories",
+		"provider_calls_allowed",
+		"release_or_publish_allowed",
+		"credential_use_allowed",
+		"direct_main_mutation_allowed",
+		"concurrent_mutation_allowed",
+	} {
+		if summary[key] != false {
+			t.Fatalf("mission rollup summary %s = %#v, want false", key, summary[key])
 		}
 	}
 }
