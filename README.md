@@ -32,6 +32,7 @@ PATH="$PWD/tmp/bin:$PATH" promoter report render --gate tmp/promotion-gate.json 
 PATH="$PWD/tmp/bin:$PATH" promoter apply --plan tmp/activation-plan.json --dry-run --out tmp/apply-dry-run.json
 PATH="$PWD/tmp/bin:$PATH" promoter live-mutation boundary --authority examples/live-mutation/valid/covenant-authority.approved.json --foundry-request examples/live-mutation/valid/foundry-request.ready.json --forge-plan examples/live-mutation/valid/forge-plan.ready.json --ao2-packet examples/live-mutation/valid/ao2-packet.ready.json --sentinel-hold examples/live-mutation/valid/sentinel-hold.clear.json --rollback examples/live-mutation/valid/rollback-rehearsal.ready.json --command-status examples/live-mutation/valid/command-status.ready.json --out tmp/live-mutation-boundary.json
 PATH="$PWD/tmp/bin:$PATH" promoter live-mutation docs-boundary --approval-ticket examples/live-docs-mutation/valid/approval-ticket.approved.json --foundry-gate examples/live-docs-mutation/valid/foundry-approval-gate.ready.json --forge-guard examples/live-docs-mutation/valid/forge-guard.ready.json --ao2-packet examples/live-docs-mutation/valid/ao2-docs-packet.ready.json --sentinel-verdict examples/live-docs-mutation/valid/sentinel-verdict.clear.json --rollback examples/live-docs-mutation/valid/rollback-execution.ready.json --command-readback examples/live-docs-mutation/valid/command-readback.ready.json --out tmp/live-docs-boundary.json
+PATH="$PWD/tmp/bin:$PATH" promoter mission rollup-summary --no-promotion examples/evidence/valid/ao-mission-gateway-no-promotion.json --out tmp/ao-mission-rollup-summary.json
 PATH="$PWD/tmp/bin:$PATH" promoter safety scan --path README.md --out tmp/readme-scan.json
 PATH="$PWD/tmp/bin:$PATH" promoter safety scan --path docs --out tmp/docs-scan.json
 PATH="$PWD/tmp/bin:$PATH" promoter safety scan --path examples --out tmp/examples-scan.json
@@ -222,6 +223,12 @@ Promoter class gate by themselves. The Promoter readback for Mission gateway
 artifacts remains `promotion_allowed=false` unless a separate exact-scope
 Covenant, Sentinel, Command, rollback, CI, and class-evidence packet proves the
 target class.
+`promoter mission rollup-summary` converts Mission gateway no-promotion
+evidence into `ao.promoter.mission-rollup-summary.v0.1` with an operator-facing
+`operator_status=no_promotion_requested`, `promotion_count=0`, and
+`no_promotion_count=1`. The summary is read-only and keeps activation,
+execution, provider, release, credential, repository mutation, and direct-main
+authority disabled.
 
 
 `public_safe_recursive_improvement_claim_threshold_calibration_evidence` is proven from AO Foundry PR #201, commit `3e3d1101da112fa5ff0aca26f8ab2933652f3502`, with tracked public evidence under
