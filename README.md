@@ -10,42 +10,6 @@ The v0.1 product is a local-first Go CLI. Default execution is fixture and
 dry-run only. AO Promoter does not push, tag, release, upload, deploy, mutate
 sibling repositories, or write live control-plane state in v0.1 default paths.
 
-## Role
-
-AO Promoter evaluates signed assurance and readiness evidence and emits
-promotion decisions. Activation execution remains outside the evaluator.
-
-## Maturity
-
-**Alpha.** Local evaluation and dry-run planning are `implemented` and
-`executable-tested`. Activation is `fixture-only`. The external-beta
-workflow is `clean-room-rehearsed`. External beta has not launched.
-
-## Install
-
-```sh
-go build -o bin/promoter ./cmd/promoter
-```
-
-## Quickstart
-
-```sh
-bin/promoter --help
-```
-
-## Safety
-
-No promotion is requested by this documentation wave. Promoter does not
-activate changes or prove unrestricted RSI. Unrestricted RSI remains denied.
-
-## External Beta
-
-Canonical topology and status live in
-[AO Architecture](https://github.com/uesugitorachiyo/ao-architecture).
-See the
-[AO Promoter component page](https://github.com/uesugitorachiyo/ao-architecture/blob/main/components/ao-promoter.md)
-for the external-beta boundary.
-
 ## Run
 
 ```sh
