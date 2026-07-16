@@ -1,0 +1,48 @@
+{
+  "schema_version": "ao.promoter.month5-operator-workflow-no-promotion.v0.1",
+  "status": "readiness_denied",
+  "subject": "month5-operator-workflow-hardening",
+  "operator_workflow_only": true,
+  "promotion_requested": false,
+  "promotion_granted": false,
+  "rsi_authorized": false,
+  "rsi_status": "denied",
+  "live_self_modification_allowed": false,
+  "provider_execution_allowed": false,
+  "external_beta_launched": false,
+  "release_or_publish_allowed": false,
+  "tag_or_upload_allowed": false,
+  "deploy_allowed": false,
+  "mutates_live_state": false,
+  "evidence": {
+    "operator_workflow_source": "defined",
+    "command_readback": "visible",
+    "safe_next_work": "selected_without_release_authority",
+    "run_state": "read_only",
+    "policy_gate": "approval_required",
+    "ao2_support": "support_categories_visible",
+    "control_plane_observation": "observation_categories_visible",
+    "sentinel_wording": "no_overclaim_checks_passed"
+  },
+  "readiness_blockers": [
+    "promotion request is absent",
+    "future explicit RSI authorization is absent",
+    "future explicit live self-modification authorization is absent",
+    "future explicit provider-backed workflow authorization is absent",
+    "release or deployment authority is absent"
+  ],
+  "expected_command_readback": {
+    "schema_version": "ao-command.promotion-status.v1",
+    "status": "observed",
+    "promotion_requested": false,
+    "promotion_granted": false,
+    "rsi_authorized": false,
+    "rsi_status": "denied",
+    "operator_summary": "Month 5 operator workflow evidence is read-only. Promotion and RSI remain denied."
+  },
+  "operator_explanation": "Month 5 makes operator workflow evidence easier to read. RSI remains denied, promotion is not requested, and no live self-modification or provider pilot is allowed.",
+  "operator_next_action": "Use Month 5 evidence for next stable release train planning and readiness assessment.",
+  "mutates_repositories": false,
+  "calls_providers": false,
+  "inspects_credentials": false
+}
