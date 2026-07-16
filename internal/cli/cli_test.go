@@ -366,6 +366,51 @@ func TestProducesPromoterVerdictToCommandStatusVector(t *testing.T) {
 	}
 }
 
+func TestMonth4ControlledLoopNoRSIVerdictFixtureDeniesPromotion(t *testing.T) {
+	root := filepath.Join("..", "..")
+	verdict := readMap(t, filepath.Join(root, "examples", "evidence", "valid", "month4-controlled-loop-no-rsi-verdict.json"))
+	if verdict["schema_version"] != "ao.promoter.month4-controlled-loop-no-rsi-verdict.v0.1" ||
+		verdict["status"] != "readiness_denied" ||
+		verdict["promotion_requested"] != false ||
+		verdict["promotion_granted"] != false ||
+		verdict["rsi_authorized"] != false ||
+		verdict["rsi_status"] != "denied" ||
+		verdict["dry_run_only"] != true {
+		t.Fatalf("unexpected Month 4 no-RSI verdict: %#v", verdict)
+	}
+	for _, key := range []string{
+		"live_self_modification_allowed",
+		"provider_execution_allowed",
+		"external_beta_launched",
+		"release_or_publish_allowed",
+		"tag_or_upload_allowed",
+		"deploy_allowed",
+		"mutates_live_state",
+	} {
+		if verdict[key] != false {
+			t.Fatalf("Month 4 no-RSI verdict %s = %#v, want false", key, verdict[key])
+		}
+	}
+	evidence, ok := verdict["evidence"].(map[string]any)
+	if !ok ||
+		evidence["policy_gate"] != "human_approval_required" ||
+		evidence["ao2_dry_run"] != "fixture_only_passed" ||
+		evidence["rollback"] != "verified" ||
+		evidence["control_plane_observation"] != "observed" ||
+		evidence["command_readback"] != "read_only" ||
+		evidence["sentinel_wording"] != "no_overclaim_checks_passed" {
+		t.Fatalf("Month 4 no-RSI verdict missing evidence readback: %#v", verdict)
+	}
+	blockers, ok := verdict["readiness_blockers"].([]any)
+	if !ok || len(blockers) == 0 {
+		t.Fatalf("Month 4 no-RSI verdict must keep readiness denied with blockers: %#v", verdict)
+	}
+	if !strings.Contains(fmt.Sprint(verdict["operator_explanation"]), "RSI remains denied") ||
+		!strings.Contains(fmt.Sprint(verdict["operator_next_action"]), "Do not request live self-modification") {
+		t.Fatalf("Month 4 no-RSI verdict missing operator-safe wording: %#v", verdict)
+	}
+}
+
 func TestLiveMutationBoundary(t *testing.T) {
 	f := newFixtureSet(t)
 	paths := f.liveMutationEvidencePaths(t, false, false)
