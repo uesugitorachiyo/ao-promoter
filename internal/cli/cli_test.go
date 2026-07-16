@@ -461,6 +461,68 @@ func TestMonth5OperatorWorkflowNoPromotionFixtureDeniesActivation(t *testing.T) 
 	}
 }
 
+func TestMonth6ReleaseReadinessNoPromotionFixtureDeniesReleaseAndActivation(t *testing.T) {
+	root := filepath.Join("..", "..")
+	verdict := readMap(t, filepath.Join(root, "examples", "evidence", "valid", "month6-release-readiness-no-promotion.json"))
+	if verdict["schema_version"] != "ao.promoter.month6-release-readiness-no-promotion.v0.1" ||
+		verdict["status"] != "no_release_readiness_recorded" ||
+		verdict["subject"] != "month6-release-train-readiness" ||
+		verdict["release_decision"] != "no_release" ||
+		verdict["promotion_requested"] != false ||
+		verdict["promotion_granted"] != false ||
+		verdict["rsi_authorized"] != false ||
+		verdict["rsi_status"] != "denied" {
+		t.Fatalf("unexpected Month 6 no-release verdict: %#v", verdict)
+	}
+	pair, ok := verdict["current_public_release_pair"].(map[string]any)
+	if !ok ||
+		pair["ao2_version"] != "v0.5.1" ||
+		pair["control_plane_version"] != "v0.1.15" {
+		t.Fatalf("Month 6 no-release verdict missing current public pair: %#v", verdict)
+	}
+	for _, key := range []string{
+		"live_self_modification_allowed",
+		"provider_execution_allowed",
+		"external_beta_launched",
+		"release_or_publish_allowed",
+		"tag_or_upload_allowed",
+		"deploy_allowed",
+		"new_binary_publication_allowed",
+		"mutates_live_state",
+		"mutates_repositories",
+		"calls_providers",
+		"inspects_credentials",
+	} {
+		if verdict[key] != false {
+			t.Fatalf("Month 6 no-release verdict %s = %#v, want false", key, verdict[key])
+		}
+	}
+	evidence, ok := verdict["evidence"].(map[string]any)
+	if !ok ||
+		evidence["release_readiness_inventory"] != "no_runtime_source_change" ||
+		evidence["command_readback"] != "release_decision_no_release_visible" ||
+		evidence["compatibility_matrix"] != "16_edges_16_tested_gate_false" {
+		t.Fatalf("Month 6 no-release verdict missing evidence readback: %#v", verdict)
+	}
+	blockers, ok := verdict["readiness_blockers"].([]any)
+	if !ok || len(blockers) < 3 {
+		t.Fatalf("Month 6 no-release verdict must keep readiness denied with blockers: %#v", verdict)
+	}
+	command, ok := verdict["expected_command_readback"].(map[string]any)
+	if !ok ||
+		command["schema_version"] != "ao-command.promotion-status.v1" ||
+		command["release_decision"] != "no_release" ||
+		command["promotion_requested"] != false ||
+		command["promotion_granted"] != false ||
+		command["rsi_authorized"] != false {
+		t.Fatalf("Month 6 no-release verdict missing Command readback: %#v", verdict)
+	}
+	explanation, _ := verdict["operator_explanation"].(string)
+	if !strings.Contains(explanation, "Promotion is not requested") || !strings.Contains(explanation, "RSI remains denied") {
+		t.Fatalf("Month 6 no-release verdict missing operator-safe wording: %#v", verdict)
+	}
+}
+
 func TestLiveMutationBoundary(t *testing.T) {
 	f := newFixtureSet(t)
 	paths := f.liveMutationEvidencePaths(t, false, false)

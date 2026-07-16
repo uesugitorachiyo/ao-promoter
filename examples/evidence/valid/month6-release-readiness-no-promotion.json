@@ -1,0 +1,53 @@
+{
+  "schema_version": "ao.promoter.month6-release-readiness-no-promotion.v0.1",
+  "status": "no_release_readiness_recorded",
+  "subject": "month6-release-train-readiness",
+  "release_decision": "no_release",
+  "current_public_release_pair": {
+    "ao2_version": "v0.5.1",
+    "ao2_tag_target": "80ec5321f42d4bab17d5e64fdae6aa099ba59d4a",
+    "control_plane_version": "v0.1.15",
+    "control_plane_tag_target": "f1702b387607566cac457458af9adb5871a5c412"
+  },
+  "promotion_requested": false,
+  "promotion_granted": false,
+  "rsi_authorized": false,
+  "rsi_status": "denied",
+  "live_self_modification_allowed": false,
+  "provider_execution_allowed": false,
+  "external_beta_launched": false,
+  "release_or_publish_allowed": false,
+  "tag_or_upload_allowed": false,
+  "deploy_allowed": false,
+  "new_binary_publication_allowed": false,
+  "mutates_live_state": false,
+  "evidence": {
+    "release_readiness_inventory": "no_runtime_source_change",
+    "architecture_readback": "month6_no_release_source_of_truth",
+    "command_readback": "release_decision_no_release_visible",
+    "sentinel_wording": "no_overclaim_checks_passed",
+    "compatibility_matrix": "16_edges_16_tested_gate_false"
+  },
+  "readiness_blockers": [
+    "release candidate is not selected",
+    "promotion request is absent",
+    "future explicit RSI authorization is absent",
+    "future explicit provider-backed workflow authorization is absent",
+    "external beta launch authorization is absent"
+  ],
+  "expected_command_readback": {
+    "schema_version": "ao-command.promotion-status.v1",
+    "status": "observed",
+    "release_decision": "no_release",
+    "promotion_requested": false,
+    "promotion_granted": false,
+    "rsi_authorized": false,
+    "rsi_status": "denied",
+    "operator_summary": "Month 6 release readiness selected no release. Promotion and RSI remain denied."
+  },
+  "operator_explanation": "Month 6 records a no-release decision for AO2 v0.5.1 and AO2 Control Plane v0.1.15. Promotion is not requested, RSI remains denied, and no release, tag, upload, deployment, provider pilot, or external beta launch is allowed.",
+  "operator_next_action": "Start the next planning cycle from adoption readiness and evidence maintenance before selecting any future release train.",
+  "mutates_repositories": false,
+  "calls_providers": false,
+  "inspects_credentials": false
+}
