@@ -1,0 +1,42 @@
+{
+  "schema_version": "ao.compatibility.promoter-verdict-to-command-status-vector.v1",
+  "vector_id": "ao-promoter-verdict-to-ao-command-promotion-status-v1",
+  "edge": "ao-promoter.promotion_verdict -> ao-command.promotion_status",
+  "producer": {
+    "repository": "ao-promoter",
+    "contract": "ao.promoter.promotion-verdict.v1"
+  },
+  "consumer": {
+    "repository": "ao-command",
+    "contract": "ao-command.promotion-status.v1"
+  },
+  "promoter_verdict": {
+    "schema_version": "ao.promoter.promotion-verdict.v1",
+    "status": "observed",
+    "verdict_id": "ao-stack-month3-wave-e-promoter-readback",
+    "candidate_id": "ao-stack-current-release-pair",
+    "assurance_inputs_accepted": 3,
+    "promotion_requested": false,
+    "promotion_granted": false,
+    "external_beta_launched": false,
+    "rsi_status": "denied",
+    "operator_summary": "Promoter observed assurance inputs for compatibility readback only."
+  },
+  "expected_command_promotion_status": {
+    "schema_version": "ao-command.promotion-status.v1",
+    "status": "observed",
+    "source_verdict_schema": "ao.promoter.promotion-verdict.v1",
+    "promotion_requested": false,
+    "promotion_granted": false,
+    "external_beta_launched": false,
+    "rsi_status": "denied"
+  },
+  "authority_boundaries": {
+    "safe_to_execute": false,
+    "executes_work": false,
+    "approves_work": false,
+    "mutates_repositories": false,
+    "calls_providers": false,
+    "releases_or_deploys": false
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "schema_version": "ao.compatibility.crucible-failure-injection-to-promoter-assurance-input-vector.v1",
+  "vector_id": "ao-crucible-failure-injection-to-ao-promoter-assurance-input-v1",
+  "edge": "ao-crucible.failure_injection_result -> ao-promoter.assurance_input",
+  "producer": {
+    "repository": "ao-crucible",
+    "contract": "ao.crucible.failure-injection-result.v0.1"
+  },
+  "consumer": {
+    "repository": "ao-promoter",
+    "contract": "ao.promoter.assurance-input.v1"
+  },
+  "crucible_failure_injection_result": {
+    "schema_version": "ao.crucible.failure-injection-result.v0.1",
+    "status": "passed",
+    "suite_id": "ao-crucible-v0.1",
+    "subject_id": "ao-orchestration",
+    "scenario_count": 10,
+    "critical_failures": 0,
+    "high_findings": 0,
+    "hardening_score": 97,
+    "minimum_required_score": 90,
+    "evidence_summary": "Fixture-mode adversarial scenarios passed without critical failures.",
+    "operator_summary": "Crucible hardening result can be consumed as assurance input only."
+  },
+  "expected_promoter_assurance_input": {
+    "schema_version": "ao.promoter.assurance-input.v1",
+    "source_result_schema": "ao.crucible.failure-injection-result.v0.1",
+    "source_repository": "ao-crucible",
+    "assurance_family": "hardening",
+    "assurance_status": "accepted",
+    "minimum_required_score": 90,
+    "observed_score": 97
+  },
+  "authority_boundaries": {
+    "promotion_requested": false,
+    "promotion_granted": false,
+    "safe_to_execute": false,
+    "executes_work": false,
+    "mutates_repositories": false,
+    "calls_providers": false,
+    "releases_or_deploys": false
+  }
+}
