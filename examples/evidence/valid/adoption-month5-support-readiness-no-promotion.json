@@ -1,0 +1,37 @@
+{
+  "schema_version": "ao.promoter.adoption-month5-support-readiness-no-promotion.v0.1",
+  "status": "ready",
+  "subject": "adoption-month5-support-readiness",
+  "support_readiness_status": "fresh",
+  "compatibility_gate_state": "ready",
+  "compatibility_gate_active": false,
+  "compatibility_gate_activation_authorized": false,
+  "promotion_requested": false,
+  "promotion_granted": false,
+  "rsi_authorized": false,
+  "external_beta_launched": false,
+  "provider_pilot_ran": false,
+  "release_or_publish": false,
+  "tag_created": false,
+  "upload_performed": false,
+  "deployment_performed": false,
+  "live_self_modification": false,
+  "support_readiness_does_not_imply_promotion": true,
+  "evidence": [
+    "ao-architecture/docs/adoption-support-readiness.md",
+    "ao-command/examples/operator/adoption-month5-support-readiness-readback.json",
+    "ao-sentinel/examples/safety/valid/adoption-month5-support-readiness-wording-lint-profile.json"
+  ],
+  "support_readback": {
+    "support_states": "fresh_stale_blocked_denied_unsupported",
+    "support_package": "install_checksum_manifest_approval_rollback_windows_operator_issue_fields"
+  },
+  "command_readback": {
+    "schema": "ao.command.operator-workflow-readback.v0.1",
+    "compatibility_gate_state": "ready",
+    "compatibility_gate_activation_authorized": false,
+    "promotion_requested": false,
+    "rsi_authorized": false
+  },
+  "operator_summary": "Month 5 support readiness does not imply promotion, gate activation, external beta, provider execution, release publication, or RSI. RSI remains denied."
+}

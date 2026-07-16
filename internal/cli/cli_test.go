@@ -675,6 +675,54 @@ func TestAdoptionMonth3EvidenceMaintenanceNoPromotionFixture(t *testing.T) {
 	}
 }
 
+func TestAdoptionMonth5SupportReadinessNoPromotionFixture(t *testing.T) {
+	root := filepath.Join("..", "..")
+	verdict := readMap(t, filepath.Join(root, "examples", "evidence", "valid", "adoption-month5-support-readiness-no-promotion.json"))
+	if verdict["schema_version"] != "ao.promoter.adoption-month5-support-readiness-no-promotion.v0.1" ||
+		verdict["status"] != "ready" ||
+		verdict["subject"] != "adoption-month5-support-readiness" ||
+		verdict["support_readiness_status"] != "fresh" ||
+		verdict["compatibility_gate_state"] != "ready" ||
+		verdict["compatibility_gate_active"] != false ||
+		verdict["promotion_requested"] != false ||
+		verdict["promotion_granted"] != false ||
+		verdict["rsi_authorized"] != false ||
+		verdict["external_beta_launched"] != false ||
+		verdict["support_readiness_does_not_imply_promotion"] != true {
+		t.Fatalf("unexpected adoption Month 5 support readiness verdict: %#v", verdict)
+	}
+	for _, key := range []string{
+		"provider_pilot_ran",
+		"release_or_publish",
+		"tag_created",
+		"upload_performed",
+		"deployment_performed",
+		"live_self_modification",
+		"compatibility_gate_activation_authorized",
+	} {
+		if verdict[key] != false {
+			t.Fatalf("adoption Month 5 verdict %s = %#v, want false", key, verdict[key])
+		}
+	}
+	support := verdict["support_readback"].(map[string]any)
+	if support["support_states"] != "fresh_stale_blocked_denied_unsupported" ||
+		support["support_package"] != "install_checksum_manifest_approval_rollback_windows_operator_issue_fields" {
+		t.Fatalf("adoption Month 5 verdict missing support readback: %#v", verdict)
+	}
+	command := verdict["command_readback"].(map[string]any)
+	if command["schema"] != "ao.command.operator-workflow-readback.v0.1" ||
+		command["compatibility_gate_state"] != "ready" ||
+		command["compatibility_gate_activation_authorized"] != false ||
+		command["promotion_requested"] != false ||
+		command["rsi_authorized"] != false {
+		t.Fatalf("adoption Month 5 verdict missing Command readback: %#v", verdict)
+	}
+	if !strings.Contains(verdict["operator_summary"].(string), "support readiness does not imply promotion") ||
+		!strings.Contains(verdict["operator_summary"].(string), "RSI remains denied") {
+		t.Fatalf("adoption Month 5 verdict missing operator-safe wording: %#v", verdict)
+	}
+}
+
 func TestLiveMutationBoundary(t *testing.T) {
 	f := newFixtureSet(t)
 	paths := f.liveMutationEvidencePaths(t, false, false)
