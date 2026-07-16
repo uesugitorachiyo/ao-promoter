@@ -1,0 +1,32 @@
+{
+  "schema_version": "ao.promoter.adoption-month2-operator-drill-no-promotion.v0.1",
+  "status": "ready",
+  "subject": "adoption-month2-operator-drills",
+  "compatibility_gate_state": "ready",
+  "compatibility_gate_active": false,
+  "promotion_requested": false,
+  "promotion_granted": false,
+  "rsi_authorized": false,
+  "external_beta_launched": false,
+  "provider_pilot_ran": false,
+  "release_or_publish": false,
+  "tag_created": false,
+  "upload_performed": false,
+  "deployment_performed": false,
+  "live_self_modification": false,
+  "operator_summary": "Operator adoption drill evidence does not imply promotion, external beta, provider execution, release authority, gate activation, or RSI. RSI remains denied.",
+  "evidence_inputs": [
+    "ao-architecture/docs/adoption-operator-drill.md",
+    "ao-command/examples/operator/adoption-month2-operator-drill-readback.json",
+    "ao-sentinel/examples/safety/valid/adoption-month2-operator-drill-wording-lint-profile.json"
+  ],
+  "command_readback": {
+    "schema": "ao.command.operator-workflow-readback.v0.1",
+    "compatibility_gate_state": "ready",
+    "compatibility_gate_activation_authorized": false,
+    "promotion_requested": false,
+    "promotion_granted": false,
+    "rsi_authorized": false,
+    "external_beta_launched": false
+  }
+}
