@@ -268,6 +268,104 @@ func TestAOMissionRollupSummaryBindsOperatorNoPromotionReadback(t *testing.T) {
 	}
 }
 
+func TestConsumesWaveEAssuranceCompatibilityVectors(t *testing.T) {
+	root := filepath.Join("..", "..")
+	cases := []struct {
+		name              string
+		path              string
+		schema            string
+		edge              string
+		producerKey       string
+		expectedKey       string
+		expectedSchema    string
+		expectedStatusKey string
+	}{
+		{
+			name:              "arena",
+			path:              filepath.Join(root, "examples", "compatibility", "arena-benchmark-result-to-promoter-assurance-input-v0.1.json"),
+			schema:            "ao.compatibility.arena-benchmark-result-to-promoter-assurance-input-vector.v1",
+			edge:              "ao-arena.benchmark_result -> ao-promoter.assurance_input",
+			producerKey:       "arena_benchmark_result",
+			expectedKey:       "expected_promoter_assurance_input",
+			expectedSchema:    "ao.promoter.assurance-input.v1",
+			expectedStatusKey: "assurance_status",
+		},
+		{
+			name:              "crucible",
+			path:              filepath.Join(root, "examples", "compatibility", "crucible-failure-injection-to-promoter-assurance-input-v0.1.json"),
+			schema:            "ao.compatibility.crucible-failure-injection-to-promoter-assurance-input-vector.v1",
+			edge:              "ao-crucible.failure_injection_result -> ao-promoter.assurance_input",
+			producerKey:       "crucible_failure_injection_result",
+			expectedKey:       "expected_promoter_assurance_input",
+			expectedSchema:    "ao.promoter.assurance-input.v1",
+			expectedStatusKey: "assurance_status",
+		},
+		{
+			name:              "sentinel",
+			path:              filepath.Join(root, "examples", "compatibility", "sentinel-verdict-to-promoter-input-v0.1.json"),
+			schema:            "ao.compatibility.sentinel-verdict-to-promoter-input-vector.v1",
+			edge:              "ao-sentinel.sentinel_verdict -> ao-promoter.promotion_input",
+			producerKey:       "sentinel_verdict",
+			expectedKey:       "expected_promoter_promotion_input",
+			expectedSchema:    "ao.promoter.promotion-input.v1",
+			expectedStatusKey: "promotion_input_status",
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			vector := readMap(t, tc.path)
+			if vector["schema_version"] != tc.schema || vector["edge"] != tc.edge {
+				t.Fatalf("unexpected vector identity: %#v", vector)
+			}
+			producer, ok := vector[tc.producerKey].(map[string]any)
+			if !ok || producer["status"] == "" {
+				t.Fatalf("vector missing producer payload: %#v", vector)
+			}
+			expected, ok := vector[tc.expectedKey].(map[string]any)
+			if !ok ||
+				expected["schema_version"] != tc.expectedSchema ||
+				expected[tc.expectedStatusKey] != "accepted" {
+				t.Fatalf("vector missing Promoter expectation: %#v", vector)
+			}
+			boundaries := vector["authority_boundaries"].(map[string]any)
+			for _, key := range []string{"promotion_requested", "promotion_granted", "safe_to_execute", "executes_work", "mutates_repositories", "calls_providers", "releases_or_deploys"} {
+				if boundaries[key] != false {
+					t.Fatalf("%s boundary %s = %#v, want false", tc.name, key, boundaries[key])
+				}
+			}
+		})
+	}
+}
+
+func TestProducesPromoterVerdictToCommandStatusVector(t *testing.T) {
+	root := filepath.Join("..", "..")
+	vector := readMap(t, filepath.Join(root, "examples", "compatibility", "promoter-verdict-to-command-status-v0.1.json"))
+	if vector["schema_version"] != "ao.compatibility.promoter-verdict-to-command-status-vector.v1" ||
+		vector["edge"] != "ao-promoter.promotion_verdict -> ao-command.promotion_status" {
+		t.Fatalf("unexpected Promoter Command vector identity: %#v", vector)
+	}
+	verdict := vector["promoter_verdict"].(map[string]any)
+	if verdict["schema_version"] != "ao.promoter.promotion-verdict.v1" ||
+		verdict["status"] != "observed" ||
+		verdict["promotion_requested"] != false ||
+		verdict["promotion_granted"] != false {
+		t.Fatalf("unexpected Promoter verdict: %#v", verdict)
+	}
+	expected := vector["expected_command_promotion_status"].(map[string]any)
+	if expected["schema_version"] != "ao-command.promotion-status.v1" ||
+		expected["status"] != "observed" ||
+		expected["promotion_requested"] != false ||
+		expected["promotion_granted"] != false {
+		t.Fatalf("unexpected Command expectation: %#v", expected)
+	}
+	boundaries := vector["authority_boundaries"].(map[string]any)
+	for _, key := range []string{"safe_to_execute", "executes_work", "approves_work", "mutates_repositories", "calls_providers", "releases_or_deploys"} {
+		if boundaries[key] != false {
+			t.Fatalf("Promoter Command vector boundary %s = %#v, want false", key, boundaries[key])
+		}
+	}
+}
+
 func TestLiveMutationBoundary(t *testing.T) {
 	f := newFixtureSet(t)
 	paths := f.liveMutationEvidencePaths(t, false, false)

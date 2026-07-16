@@ -1,0 +1,44 @@
+{
+  "schema_version": "ao.compatibility.arena-benchmark-result-to-promoter-assurance-input-vector.v1",
+  "vector_id": "ao-arena-benchmark-result-to-ao-promoter-assurance-input-v1",
+  "edge": "ao-arena.benchmark_result -> ao-promoter.assurance_input",
+  "producer": {
+    "repository": "ao-arena",
+    "contract": "ao.arena.benchmark-result.v0.1"
+  },
+  "consumer": {
+    "repository": "ao-promoter",
+    "contract": "ao.promoter.assurance-input.v1"
+  },
+  "arena_benchmark_result": {
+    "schema_version": "ao.arena.benchmark-result.v0.1",
+    "status": "passed",
+    "suite_id": "ao-arena-v0.1",
+    "baseline": "bare-codex",
+    "challenger": "ao-orchestration",
+    "winner": "ao-orchestration",
+    "result": "strong_win",
+    "score": 92,
+    "minimum_required_score": 85,
+    "evidence_summary": "Fixture-mode comparison result is deterministic and public-safe.",
+    "operator_summary": "AO orchestration benchmark result can be consumed as assurance input only."
+  },
+  "expected_promoter_assurance_input": {
+    "schema_version": "ao.promoter.assurance-input.v1",
+    "source_result_schema": "ao.arena.benchmark-result.v0.1",
+    "source_repository": "ao-arena",
+    "assurance_family": "benchmark",
+    "assurance_status": "accepted",
+    "minimum_required_score": 85,
+    "observed_score": 92
+  },
+  "authority_boundaries": {
+    "promotion_requested": false,
+    "promotion_granted": false,
+    "safe_to_execute": false,
+    "executes_work": false,
+    "mutates_repositories": false,
+    "calls_providers": false,
+    "releases_or_deploys": false
+  }
+}
