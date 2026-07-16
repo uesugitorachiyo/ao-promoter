@@ -411,6 +411,56 @@ func TestMonth4ControlledLoopNoRSIVerdictFixtureDeniesPromotion(t *testing.T) {
 	}
 }
 
+func TestMonth5OperatorWorkflowNoPromotionFixtureDeniesActivation(t *testing.T) {
+	root := filepath.Join("..", "..")
+	verdict := readMap(t, filepath.Join(root, "examples", "evidence", "valid", "month5-operator-workflow-no-promotion.json"))
+	if verdict["schema_version"] != "ao.promoter.month5-operator-workflow-no-promotion.v0.1" ||
+		verdict["status"] != "readiness_denied" ||
+		verdict["subject"] != "month5-operator-workflow-hardening" ||
+		verdict["promotion_requested"] != false ||
+		verdict["promotion_granted"] != false ||
+		verdict["rsi_authorized"] != false ||
+		verdict["rsi_status"] != "denied" ||
+		verdict["operator_workflow_only"] != true {
+		t.Fatalf("unexpected Month 5 no-promotion verdict: %#v", verdict)
+	}
+	for _, key := range []string{
+		"live_self_modification_allowed",
+		"provider_execution_allowed",
+		"external_beta_launched",
+		"release_or_publish_allowed",
+		"tag_or_upload_allowed",
+		"deploy_allowed",
+		"mutates_live_state",
+	} {
+		if verdict[key] != false {
+			t.Fatalf("Month 5 no-promotion verdict %s = %#v, want false", key, verdict[key])
+		}
+	}
+	evidence, ok := verdict["evidence"].(map[string]any)
+	if !ok ||
+		evidence["operator_workflow_source"] != "defined" ||
+		evidence["command_readback"] != "visible" ||
+		evidence["safe_next_work"] != "selected_without_release_authority" ||
+		evidence["run_state"] != "read_only" ||
+		evidence["policy_gate"] != "approval_required" ||
+		evidence["sentinel_wording"] != "no_overclaim_checks_passed" {
+		t.Fatalf("Month 5 no-promotion verdict missing evidence readback: %#v", verdict)
+	}
+	command, ok := verdict["expected_command_readback"].(map[string]any)
+	if !ok ||
+		command["schema_version"] != "ao-command.promotion-status.v1" ||
+		command["promotion_requested"] != false ||
+		command["promotion_granted"] != false ||
+		command["rsi_authorized"] != false {
+		t.Fatalf("Month 5 no-promotion verdict missing Command readback: %#v", verdict)
+	}
+	if !strings.Contains(fmt.Sprint(verdict["operator_explanation"]), "RSI remains denied") ||
+		!strings.Contains(fmt.Sprint(verdict["operator_next_action"]), "next stable release train planning") {
+		t.Fatalf("Month 5 no-promotion verdict missing operator-safe wording: %#v", verdict)
+	}
+}
+
 func TestLiveMutationBoundary(t *testing.T) {
 	f := newFixtureSet(t)
 	paths := f.liveMutationEvidencePaths(t, false, false)
