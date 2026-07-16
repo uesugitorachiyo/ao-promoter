@@ -585,6 +585,47 @@ func TestAdoptionMonth1GateReadinessNoPromotionFixture(t *testing.T) {
 	}
 }
 
+func TestGitHubIssueWorkflowNoPromotionFixture(t *testing.T) {
+	root := filepath.Join("..", "..")
+	verdict := readMap(t, filepath.Join(root, "examples", "evidence", "valid", "github-issue-workflow-no-promotion.json"))
+	if verdict["schema_version"] != "ao.promoter.github-issue-workflow-no-promotion.v0.1" ||
+		verdict["status"] != "ready" ||
+		verdict["subject"] != "github-issue-to-draft-pr-month1" ||
+		verdict["promotion_requested"] != false ||
+		verdict["promotion_granted"] != false ||
+		verdict["external_beta_launched"] != false ||
+		verdict["release_selected"] != false ||
+		verdict["rsi_authorized"] != false ||
+		verdict["readiness_does_not_imply_promotion"] != true {
+		t.Fatalf("unexpected GitHub issue workflow no-promotion verdict: %#v", verdict)
+	}
+	pair := verdict["current_public_pair"].(map[string]any)
+	if pair["ao2"] != "v0.5.1" || pair["control_plane"] != "v0.1.16" {
+		t.Fatalf("GitHub issue workflow verdict has stale current pair: %#v", pair)
+	}
+	pr := verdict["feature_generated_pr_state"].(map[string]any)
+	if pr["draft_pr_allowed_after_digest_approval"] != true ||
+		pr["ready_for_review_allowed"] != false ||
+		pr["merge_allowed"] != false ||
+		pr["review_approval_allowed"] != false {
+		t.Fatalf("GitHub issue workflow PR boundary widened: %#v", pr)
+	}
+	if verdict["github_issue_writes_allowed"] != false {
+		t.Fatalf("GitHub issue writes must remain denied: %#v", verdict)
+	}
+	refs := verdict["evidence_refs"].([]any)
+	if len(refs) != 3 {
+		t.Fatalf("GitHub issue workflow verdict missing evidence refs: %#v", verdict)
+	}
+	command := verdict["operator_readback"].(map[string]any)
+	if command["promotion_requested"] != false ||
+		command["promotion_granted"] != false ||
+		command["external_beta_launched"] != false ||
+		command["rsi_authorized"] != false {
+		t.Fatalf("GitHub issue workflow command readback widened authority: %#v", command)
+	}
+}
+
 func TestAdoptionMonth2OperatorDrillNoPromotionFixture(t *testing.T) {
 	root := filepath.Join("..", "..")
 	verdict := readMap(t, filepath.Join(root, "examples", "evidence", "valid", "adoption-month2-operator-drill-no-promotion.json"))

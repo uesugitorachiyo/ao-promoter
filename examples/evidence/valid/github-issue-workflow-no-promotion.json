@@ -1,0 +1,35 @@
+{
+  "schema_version": "ao.promoter.github-issue-workflow-no-promotion.v0.1",
+  "status": "ready",
+  "subject": "github-issue-to-draft-pr-month1",
+  "current_public_pair": {
+    "ao2": "v0.5.1",
+    "control_plane": "v0.1.16"
+  },
+  "feature_generated_pr_state": {
+    "draft_pr_allowed_after_digest_approval": true,
+    "ready_for_review_allowed": false,
+    "merge_allowed": false,
+    "review_approval_allowed": false
+  },
+  "github_issue_writes_allowed": false,
+  "promotion_requested": false,
+  "promotion_granted": false,
+  "external_beta_launched": false,
+  "release_selected": false,
+  "rsi_authorized": false,
+  "readiness_does_not_imply_promotion": true,
+  "evidence_refs": [
+    "ao-architecture/stack/github-issue-workflow-contracts.json",
+    "ao-command/examples/operator/github-issue-month1-readback.json",
+    "ao-sentinel/examples/safety/valid/github-issue-workflow-wording.md"
+  ],
+  "operator_readback": {
+    "schema_version": "ao-command.github-issue-workflow-promotion-readback.v0.1",
+    "promotion_requested": false,
+    "promotion_granted": false,
+    "external_beta_launched": false,
+    "rsi_authorized": false,
+    "exact_next_action": "complete read-only Month 1 intake and keep feature-generated PRs draft and unmerged"
+  }
+}
