@@ -523,6 +523,68 @@ func TestMonth6ReleaseReadinessNoPromotionFixtureDeniesReleaseAndActivation(t *t
 	}
 }
 
+func TestAdoptionMonth1GateReadinessNoPromotionFixture(t *testing.T) {
+	root := filepath.Join("..", "..")
+	verdict := readMap(t, filepath.Join(root, "examples", "evidence", "valid", "adoption-month1-gate-readiness-no-promotion.json"))
+	if verdict["schema_version"] != "ao.promoter.adoption-month1-gate-readiness-no-promotion.v0.1" ||
+		verdict["status"] != "gate_ready_no_promotion" ||
+		verdict["subject"] != "adoption-month1-evidence-freshness" ||
+		verdict["compatibility_gate_state"] != "ready" ||
+		verdict["compatibility_gate_active"] != false ||
+		verdict["promotion_requested"] != false ||
+		verdict["promotion_granted"] != false ||
+		verdict["rsi_authorized"] != false ||
+		verdict["external_beta_launched"] != false {
+		t.Fatalf("unexpected adoption Month 1 gate-readiness verdict: %#v", verdict)
+	}
+	currentPair, ok := verdict["current_public_release_pair"].(map[string]any)
+	if !ok ||
+		currentPair["ao2_version"] != "v0.5.1" ||
+		currentPair["ao2_tag_target"] != "80ec5321f42d4bab17d5e64fdae6aa099ba59d4a" ||
+		currentPair["control_plane_version"] != "v0.1.15" ||
+		currentPair["control_plane_tag_target"] != "f1702b387607566cac457458af9adb5871a5c412" {
+		t.Fatalf("adoption Month 1 verdict missing current public pair: %#v", verdict)
+	}
+	evidence, ok := verdict["evidence"].(map[string]any)
+	if !ok ||
+		evidence["freshness_status"] != "fresh" ||
+		evidence["compatibility_matrix"] != "16_edges_16_tested" ||
+		evidence["gate_activation"] != "not_authorized" {
+		t.Fatalf("adoption Month 1 verdict missing evidence readback: %#v", verdict)
+	}
+	blockers, ok := verdict["readiness_blockers"].([]any)
+	if !ok || len(blockers) < 3 {
+		t.Fatalf("adoption Month 1 verdict must retain readiness blockers: %#v", verdict)
+	}
+	command, ok := verdict["expected_command_readback"].(map[string]any)
+	if !ok ||
+		command["compatibility_gate_state"] != "ready" ||
+		command["compatibility_gate_active"] != false ||
+		command["promotion_granted"] != false ||
+		command["rsi_authorized"] != false {
+		t.Fatalf("adoption Month 1 verdict missing Command readback: %#v", verdict)
+	}
+	if !strings.Contains(fmt.Sprint(verdict["operator_explanation"]), "does not activate") ||
+		!strings.Contains(fmt.Sprint(verdict["operator_next_action"]), "operator adoption drills") {
+		t.Fatalf("adoption Month 1 verdict missing operator-safe wording: %#v", verdict)
+	}
+	for _, key := range []string{
+		"live_self_modification_allowed",
+		"provider_execution_allowed",
+		"release_or_publish_allowed",
+		"tag_or_upload_allowed",
+		"deploy_allowed",
+		"new_binary_publication_allowed",
+		"mutates_live_state",
+		"calls_providers",
+		"inspects_credentials",
+	} {
+		if verdict[key] != false {
+			t.Fatalf("adoption Month 1 verdict %s = %#v, want false", key, verdict[key])
+		}
+	}
+}
+
 func TestLiveMutationBoundary(t *testing.T) {
 	f := newFixtureSet(t)
 	paths := f.liveMutationEvidencePaths(t, false, false)
