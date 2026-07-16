@@ -1,0 +1,53 @@
+{
+  "schema_version": "ao.promoter.adoption-month1-gate-readiness-no-promotion.v0.1",
+  "status": "gate_ready_no_promotion",
+  "subject": "adoption-month1-evidence-freshness",
+  "current_public_release_pair": {
+    "ao2_version": "v0.5.1",
+    "ao2_tag_target": "80ec5321f42d4bab17d5e64fdae6aa099ba59d4a",
+    "control_plane_version": "v0.1.15",
+    "control_plane_tag_target": "f1702b387607566cac457458af9adb5871a5c412"
+  },
+  "compatibility_gate_state": "ready",
+  "compatibility_gate_active": false,
+  "promotion_requested": false,
+  "promotion_granted": false,
+  "rsi_authorized": false,
+  "rsi_status": "denied",
+  "live_self_modification_allowed": false,
+  "provider_execution_allowed": false,
+  "external_beta_launched": false,
+  "release_or_publish_allowed": false,
+  "tag_or_upload_allowed": false,
+  "deploy_allowed": false,
+  "new_binary_publication_allowed": false,
+  "mutates_live_state": false,
+  "evidence": {
+    "freshness_status": "fresh",
+    "compatibility_matrix": "16_edges_16_tested",
+    "gate_activation": "not_authorized",
+    "command_readback": "gate_ready_visible",
+    "sentinel_wording": "no_overclaim_checks_passed"
+  },
+  "readiness_blockers": [
+    "compatibility gate activation is not authorized",
+    "promotion request is absent",
+    "future explicit RSI authorization is absent",
+    "external beta launch authorization is absent"
+  ],
+  "expected_command_readback": {
+    "schema_version": "ao-command.promotion-status.v1",
+    "status": "observed",
+    "compatibility_gate_state": "ready",
+    "compatibility_gate_active": false,
+    "promotion_requested": false,
+    "promotion_granted": false,
+    "rsi_authorized": false,
+    "rsi_status": "denied",
+    "operator_summary": "Compatibility evidence is fresh and the gate is ready, but activation, promotion, external beta, and RSI remain denied."
+  },
+  "operator_explanation": "Month 1 records refreshed compatibility evidence and a ready gate state. This does not activate the gate, request promotion, launch external beta, or authorize RSI.",
+  "operator_next_action": "Run Month 2 operator adoption drills using the refreshed evidence base.",
+  "calls_providers": false,
+  "inspects_credentials": false
+}
