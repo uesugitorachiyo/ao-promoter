@@ -62,6 +62,21 @@ func TestEvidenceDigestFreshnessAndCandidateChecks(t *testing.T) {
 	digestMismatch["evidence"] = refs
 	assertRunFails(t, []string{"packet", "validate", "--packet", f.writeJSON("packet-digest-mismatch.json", digestMismatch)}, "digest mismatch")
 
+	crlfEvidence := cloneMap(t, f.packet)
+	refs = cloneSliceMap(t, crlfEvidence["evidence"])
+	originalPath := refs[0]["path"].(string)
+	originalBytes, err := os.ReadFile(originalPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	crlfPath := filepath.Join(f.root, "arena-promotion-gate-crlf.json")
+	if err := os.WriteFile(crlfPath, []byte(strings.ReplaceAll(string(originalBytes), "\n", "\r\n")), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	refs[0]["path"] = crlfPath
+	crlfEvidence["evidence"] = refs
+	assertRunOK(t, []string{"packet", "validate", "--packet", f.writeJSON("packet-crlf-evidence.json", crlfEvidence)})
+
 	stale := cloneMap(t, f.packet)
 	refs = cloneSliceMap(t, stale["evidence"])
 	refs[0]["expires_at_utc"] = "2000-01-01T00:00:00Z"

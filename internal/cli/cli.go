@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -1352,7 +1353,7 @@ func loadPacket(path string) (packetState, error) {
 			state.Blockers = append(state.Blockers, newBlocker(role, "critical", "missing sha256 digest", path, "record evidence digest"))
 			continue
 		}
-		if digest, err := sha256File(path); err != nil {
+		if digest, err := sha256EvidenceFile(path); err != nil {
 			state.Blockers = append(state.Blockers, newBlocker(role, "critical", "missing evidence file", path, "add evidence file"))
 		} else if digest != stringField(ref, "sha256") {
 			state.Blockers = append(state.Blockers, newBlocker(role, "critical", "digest mismatch", path, "refresh evidence digest"))
@@ -1629,6 +1630,18 @@ func sha256File(path string) (string, error) {
 	body, err := os.ReadFile(path)
 	if err != nil {
 		return "", err
+	}
+	sum := sha256.Sum256(body)
+	return hex.EncodeToString(sum[:]), nil
+}
+
+func sha256EvidenceFile(path string) (string, error) {
+	body, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	if strings.EqualFold(filepath.Ext(path), ".json") {
+		body = bytes.ReplaceAll(body, []byte("\r\n"), []byte("\n"))
 	}
 	sum := sha256.Sum256(body)
 	return hex.EncodeToString(sum[:]), nil
