@@ -163,6 +163,35 @@ func TestGateEvaluationActivationRollbackReportApplyAndSafety(t *testing.T) {
 	assertRunFails(t, []string{"safety", "scan", "--path", f.unsafeDocPath, "--out", filepath.Join(f.tmp, "unsafe-scan.json")}, "safety scan failed")
 }
 
+func TestSafetyScanBuildsDetectorsOncePerScanForScaleFixture(t *testing.T) {
+	f := newFixtureSet(t)
+	scalePath := filepath.Join(f.root, "scanner-scale.md")
+	lines := make([]string, 500)
+	for i := range lines {
+		lines[i] = "Safe promoter fixture line with public gate evidence and no authority expansion."
+	}
+	if err := os.WriteFile(scalePath, []byte(strings.Join(lines, "\n")), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	outPath := filepath.Join(f.tmp, "scanner-scale.json")
+
+	assertRunOK(t, []string{"safety", "scan", "--path", scalePath, "--out", outPath})
+	packet := readMap(t, outPath)
+	metrics, ok := packet["scanner_metrics"].(map[string]any)
+	if !ok {
+		t.Fatalf("safety scan should report scanner metrics for detector construction regression: %#v", packet)
+	}
+	if metrics["detector_construction_count"] != float64(1) {
+		t.Fatalf("detectors should be constructed once per scan, got metrics: %#v", metrics)
+	}
+	if metrics["lines_scanned"] != float64(len(lines)) {
+		t.Fatalf("scale fixture line count mismatch: %#v", metrics)
+	}
+	if packet["status"] != "passed" || packet["findings_count"].(float64) != 0 {
+		t.Fatalf("scale fixture should remain safety-clean: %#v", packet)
+	}
+}
+
 func TestEvidenceInspectReportsDigestStatus(t *testing.T) {
 	f := newFixtureSet(t)
 	var out, err bytes.Buffer
