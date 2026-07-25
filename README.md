@@ -69,13 +69,7 @@ Implement slice by slice. Keep v0.1 dry-run by default. A real active-stack
 mutation requires a future live profile, explicit operator approval, valid
 rollback plan, clean public-safety scan, and non-default command flag.
 
-<!-- Legacy documentation-test compatibility tokens (not rendered):
-AO Mission Gateway No-Promotion Readback
-gateway readbacks are no-promotion evidence
-Telegram and A2A intents cannot promote classes
-timeline compaction is readback only
-promotion_allowed=false
--->
+Legacy integration wording is documented in [COMPATIBILITY.md](COMPATIBILITY.md).
 
 ## License
 
