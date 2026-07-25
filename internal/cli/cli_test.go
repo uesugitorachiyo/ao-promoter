@@ -203,12 +203,12 @@ func TestEvidenceInspectReportsDigestStatus(t *testing.T) {
 	}
 }
 
-func TestReadmeDocumentsAOMissionGatewayNoPromotionBoundary(t *testing.T) {
-	readme, err := os.ReadFile(filepath.Join("..", "..", "README.md"))
+func TestCompatibilityDocDocumentsAOMissionGatewayNoPromotionBoundary(t *testing.T) {
+	compatibility, err := os.ReadFile(filepath.Join("..", "..", "COMPATIBILITY.md"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	doc := string(readme)
+	doc := string(compatibility)
 	for _, want := range []string{
 		"AO Mission Gateway No-Promotion Readback",
 		"gateway readbacks are no-promotion evidence",
@@ -217,7 +217,7 @@ func TestReadmeDocumentsAOMissionGatewayNoPromotionBoundary(t *testing.T) {
 		"promotion_allowed=false",
 	} {
 		if !strings.Contains(doc, want) {
-			t.Fatalf("README missing AO Mission gateway no-promotion wording %q", want)
+			t.Fatalf("COMPATIBILITY.md missing AO Mission gateway no-promotion wording %q", want)
 		}
 	}
 }
