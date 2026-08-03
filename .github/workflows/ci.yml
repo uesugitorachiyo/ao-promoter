@@ -36,12 +36,22 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: Checkout pinned supply-chain policy
-        uses: actions/checkout@v7
-        with:
-          repository: uesugitorachiyo/ao-architecture
-          ref: 45e75766dfe1eaf586a4e87259cbc44ae4b2ce7a
-          path: .ao-supply-chain-policy
+      - name: Build native artifact from clean source
+        shell: bash
+        run: |
+          set -euo pipefail
+          artifact_dir="target/native-artifacts/${{ matrix.target_label }}"
+          binary="ao-promoter${{ matrix.binary_suffix }}"
+          mkdir -p "$artifact_dir"
+          go build -trimpath -o "$artifact_dir/$binary" ./cmd/promoter
+          "$artifact_dir/$binary" --help > "$artifact_dir/help.txt"
+          cp LICENSE NOTICE "$artifact_dir/"
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum "$artifact_dir/$binary" > "$artifact_dir/SHA256SUMS"
+          else
+            shasum -a 256 "$artifact_dir/$binary" > "$artifact_dir/SHA256SUMS"
+          fi
+          go env -json GOOS GOARCH GOVERSION > "$artifact_dir/go-env.json"
 
       - name: Test
         run: go test ./... -count=1
@@ -58,22 +68,19 @@ jobs:
           pattern="ghp""_|github""_pat_|BEGIN ""RSA|BEGIN ""OPENSSH|ANTI""GRAVITY|private ""handoff|api""_key|access""_token"
           ! rg -n "$pattern" README.md docs examples internal cmd
 
-      - name: Build native artifact
+      - name: Checkout pinned supply-chain policy
+        uses: actions/checkout@v7
+        with:
+          repository: uesugitorachiyo/ao-architecture
+          ref: 29f13c22229f0cc147c16dccb6fca5e835ea8b51
+          path: .ao-supply-chain-policy
+
+      - name: Package and verify supply-chain evidence
         shell: bash
         run: |
           set -euo pipefail
           artifact_dir="target/native-artifacts/${{ matrix.target_label }}"
           binary="ao-promoter${{ matrix.binary_suffix }}"
-          mkdir -p "$artifact_dir"
-          go build -trimpath -o "$artifact_dir/$binary" ./cmd/promoter
-          "$artifact_dir/$binary" --help > "$artifact_dir/help.txt"
-          cp LICENSE NOTICE "$artifact_dir/"
-          if command -v sha256sum >/dev/null 2>&1; then
-            sha256sum "$artifact_dir/$binary" > "$artifact_dir/SHA256SUMS"
-          else
-            shasum -a 256 "$artifact_dir/$binary" > "$artifact_dir/SHA256SUMS"
-          fi
-          go env -json GOOS GOARCH GOVERSION > "$artifact_dir/go-env.json"
           go run .ao-supply-chain-policy/scripts/read_go_binary_metadata.go \
             "$artifact_dir/$binary" > "$artifact_dir/go-modules.json"
           source_sha="${GITHUB_SHA}"
@@ -103,7 +110,7 @@ jobs:
             --inventory .ao-supply-chain-policy/stack/distributable-inventory.json \
             --policy .ao-supply-chain-policy/stack/sbom-policy.json \
             --evidence "$supply_chain_dir/supply-chain-evidence.json" \
-            --workspace-root . \
+            --workspace-root "$supply_chain_dir" \
             --expected-source-sha "$source_sha" \
             --expected-version "$version" \
             --expected-target "$TARGET_LABEL" \

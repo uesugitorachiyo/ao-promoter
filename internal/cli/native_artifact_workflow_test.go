@@ -30,6 +30,7 @@ func TestNativeArtifactWorkflowContract(t *testing.T) {
 		"./cmd/promoter",
 		"--help",
 		"contents: read",
+		"29f13c22229f0cc147c16dccb6fca5e835ea8b51",
 	} {
 		if !strings.Contains(workflow, want) {
 			t.Fatalf("native artifact workflow missing %q", want)
@@ -44,5 +45,14 @@ func TestNativeArtifactWorkflowContract(t *testing.T) {
 		if strings.Contains(workflow, forbidden) {
 			t.Fatalf("tier 3 artifact workflow must not include %q", forbidden)
 		}
+	}
+
+	nativeBuild := strings.Index(workflow, "name: Build native artifact from clean source")
+	policyCheckout := strings.Index(workflow, "name: Checkout pinned supply-chain policy")
+	if nativeBuild < 0 || policyCheckout < 0 || nativeBuild >= policyCheckout {
+		t.Fatal("native artifact must be built before the policy checkout modifies the source tree")
+	}
+	if !strings.Contains(workflow, `--workspace-root "$supply_chain_dir"`) {
+		t.Fatal("downloadable supply-chain evidence must verify relative to its bundle")
 	}
 }
