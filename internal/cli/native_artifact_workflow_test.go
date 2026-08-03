@@ -30,7 +30,7 @@ func TestNativeArtifactWorkflowContract(t *testing.T) {
 		"./cmd/promoter",
 		"--help",
 		"contents: read",
-		"29f13c22229f0cc147c16dccb6fca5e835ea8b51",
+		"4c501b4f1e55cb9b926709e19d496edf41984fb1",
 	} {
 		if !strings.Contains(workflow, want) {
 			t.Fatalf("native artifact workflow missing %q", want)

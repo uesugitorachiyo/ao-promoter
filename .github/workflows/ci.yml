@@ -72,7 +72,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           repository: uesugitorachiyo/ao-architecture
-          ref: 29f13c22229f0cc147c16dccb6fca5e835ea8b51
+          ref: 4c501b4f1e55cb9b926709e19d496edf41984fb1
           path: .ao-supply-chain-policy
 
       - name: Package and verify supply-chain evidence
