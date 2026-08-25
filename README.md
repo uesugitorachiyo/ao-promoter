@@ -61,13 +61,13 @@ git diff --check
 | `docs/sdd/AO-PROMOTER-SAFETY.md` | Public-safety, dry-run, approval, and fail-closed rules. |
 | `docs/sdd/AO-PROMOTER-IMPLEMENTATION-SLICES.md` | Implementation slices in dependency order. |
 | `docs/sdd/AO-PROMOTER-ACCEPTANCE-GATES.md` | SDD and product 100/100 readiness gates. |
-| `docs/sdd/AO-PROMOTER-SDD-HANDOFF.md` | Handoff prompt for AO Forge, AO Foundry, or Codex. |
 
-## Implementation Rule
+## Fixture Workflow
 
-Implement slice by slice. Keep v0.1 dry-run by default. A real active-stack
-mutation requires a future live profile, explicit operator approval, valid
-rollback plan, clean public-safety scan, and non-default command flag.
+Run the product-gate commands above against the maintained public fixtures.
+They write generated output only under `tmp/`; `promoter apply` requires
+`--dry-run` and reports no mutation. A real active-stack mutation remains
+outside this public workflow and requires separate authority.
 
 Legacy integration wording is documented in [COMPATIBILITY.md](COMPATIBILITY.md).
 
