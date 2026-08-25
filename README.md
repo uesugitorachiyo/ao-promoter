@@ -20,6 +20,10 @@ and the
 [AO Promoter component page](https://github.com/uesugitorachiyo/ao-architecture/blob/main/components/ao-promoter.md)
 for the cross-repository flow.
 
+## Build and run from source
+
+Requires Go 1.22 or later.
+
 ## Run
 
 ```sh
@@ -54,7 +58,7 @@ git diff --check
 | File | Purpose |
 | --- | --- |
 | `docs/sdd/AO-PROMOTER-PRD.md` | Product scope, users, non-goals, and readiness definition. |
-| `docs/sdd/AO-PROMOTER-ARCHITECTURE.md` | Planned CLI, packages, data flow, storage layout, and integrations. |
+| `docs/sdd/AO-PROMOTER-ARCHITECTURE.md` | CLI, packages, data flow, storage layout, and integrations. |
 | `docs/sdd/AO-PROMOTER-CONTRACTS.md` | JSON contract families, required fields, fixtures, and validation rules. |
 | `docs/sdd/AO-PROMOTER-GATES.md` | Promotion gate matrix and blocker semantics. |
 | `docs/sdd/AO-PROMOTER-ACTIVE-STACK.md` | Active-stack manifest, activation, and rollback semantics. |
